@@ -2,4 +2,4 @@
 
 
 #Project M.A.C
-The Marvelous Autonomous Car!
+The Marvelous Amazing Car!
