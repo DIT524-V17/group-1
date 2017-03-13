@@ -39,7 +39,9 @@ captures/
 .idea/gradle.xml
 .idea/dictionaries
 .idea/libraries
-
+# Inside Android-app folder as well
+Android-app/.idea/*
+Android-app/.idea
 # Keystore files
 *.jks
 
