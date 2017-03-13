@@ -60,15 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        // charsequence for testing
-        CharSequence text1 = "action1";
-        CharSequence text2 = "action2";
-        Context con = getBaseContext();
-        int duration = Toast.LENGTH_SHORT;
-
-        final Toast toas1 = Toast.makeText(con, text1, duration);
-        final Toast toas2 = Toast.makeText(con, text2, duration);
-
 
         /**
          * MOVING WILL BE DONE USING WASD
@@ -84,11 +75,11 @@ public class MainActivity extends AppCompatActivity {
                 // set power forward
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        toas1.show();
+
                         sendData("w");
                         return true;
                     case MotionEvent.ACTION_UP:
-                        toas1.show();
+
                         sendData("x");  // stop
                         return true;
                 }
@@ -101,11 +92,11 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        toas1.show();
+
                         sendData("s");
                         return true;
                     case MotionEvent.ACTION_UP:
-                        toas1.show();
+
                         sendData("x");  // stop
                         return true;
                 }
@@ -121,11 +112,11 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        toas2.show();
+
                         sendData("a");
                         return true;
                     case MotionEvent.ACTION_UP:
-                        toas2.show();
+
                         sendData("x"); // stop
                         return true;
 
@@ -141,11 +132,11 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        toas2.show();
+
                         sendData("d");
                         return true;
                     case MotionEvent.ACTION_UP:
-                        toas2.show();
+
                         sendData("x");  // stop
                         return true;
                 }
