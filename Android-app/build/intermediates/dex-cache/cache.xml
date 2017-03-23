@@ -2,6 +2,24 @@
 <items version="2" >
 
     <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="2013d3ca0cd1ed0be8c422dfe48c7365984ccd26">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_1646b148009e832aee64285470cfe5e4ad77ccf7/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="0d191c1a09e4892d059e5ce749e4ad4e08129e35">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-animated-vector-drawable-25.1.1_a39e6826ccc7e29a8bc7a9233e409cb352ecf12b/classes.dex" />
+    </item>
+    <item
         is-multidex="false"
         jar="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.1.1/jars/classes.jar"
         jumboMode="false"
@@ -29,6 +47,24 @@
         <dex dex="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-25.1.1_1d9f48ac3110f7d17ccf97826fc7d9bddae4c0e2.jar" />
     </item>
     <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="0fb891e8f0cfba0513043a7bb357513d229ca2cd">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-utils-25.1.1_1f2131cb362ed2d161521a0f9ab9cad1fd79b9c9/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="ecb496cc08dd52551fc5ec6db3bc0632e95a89bb">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-25.1.1_4faa08ea9033635dcf89333c5f1eb984d3a4af42/classes.dex" />
+    </item>
+    <item
         is-multidex="false"
         jar="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/exploded-aar/com.android.support/support-fragment/25.1.1/jars/classes.jar"
         jumboMode="false"
@@ -36,6 +72,24 @@
         revision="25.0.2"
         sha1="e2719c102dca3a7a5b02ce07f769362da6ddb4ab">
         <dex dex="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/pre-dexed/debug/com.android.support-support-fragment-25.1.1_cde072106483c40c9c462e02eb351f745d152c6b.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/support-compat/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="02741d05d4b697fba5e279e9881aaa1da0ca7c7f">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-compat-25.1.1_6f31fbe5e5882b16cd1fba436e5af7f357538503/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/25.1.1/support-annotations-25.1.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="b59b6ee8d6ecc03e672d253800430343493a6ed8">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-25.1.1_b6fa526dd50d3a1202bcd2e9c1640164c18b3945/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -47,6 +101,33 @@
         <dex dex="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/pre-dexed/debug/support-annotations-25.1.1_b6fa526dd50d3a1202bcd2e9c1640164c18b3945.jar" />
     </item>
     <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3e04ac8ca644ea7baddf6fdcf72e15c79e9df94a">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-ui-25.1.1_07e59d34c51ce7c2796085378318e042cabbec5f/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="a25dde6ccfd03c7e258b741c0d56073362367dfe">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_d085c43c7d6924e7bed0680595dca8e78708571b/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="7bde4c34162092e0a77e7f12dc85ed77c484cf5c">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-media-compat-25.1.1_5a86eb2faf14142b091a1d64a29b048df8b4279a/classes.dex" />
+    </item>
+    <item
         is-multidex="false"
         jar="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/exploded-aar/com.android.support/support-compat/25.1.1/jars/classes.jar"
         jumboMode="false"
@@ -54,6 +135,15 @@
         revision="25.0.2"
         sha1="02741d05d4b697fba5e279e9881aaa1da0ca7c7f">
         <dex dex="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/pre-dexed/debug/com.android.support-support-compat-25.1.1_c9dba0908215521427112d98c5cc1db65da48a7d.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/support-fragment/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e2719c102dca3a7a5b02ce07f769362da6ddb4ab">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-fragment-25.1.1_89ec261c15d365d0cfe6d0f1cf6189de1684381e/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -65,6 +155,15 @@
         <dex dex="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-utils-25.1.1_9d117739d159b010f8b8affacdb2c4ecc4a843a1.jar" />
     </item>
     <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c03bf57f358aa10d253f21989e93bcf6014b3b17">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-25.1.1_1831703674f104202ca2462be9bf09e053794db3/classes.dex" />
+    </item>
+    <item
         is-multidex="false"
         jar="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.1.1/jars/classes.jar"
         jumboMode="false"
@@ -72,6 +171,15 @@
         revision="25.0.2"
         sha1="7bde4c34162092e0a77e7f12dc85ed77c484cf5c">
         <dex dex="/home/jd/AndroidStudioProjects/Bluetoothcontroller/app/build/intermediates/pre-dexed/debug/com.android.support-support-media-compat-25.1.1_835087692fcd424affa39a542ff083240d4e1e43.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/jd/MAC/Android-app/app/build/intermediates/exploded-aar/com.android.support/support-v4/25.1.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/home/jd/MAC/Android-app/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-25.1.1_2f1e36484094223e91a713aaa9e14cbe0ece4cb9/classes.dex" />
     </item>
     <item
         is-multidex="false"

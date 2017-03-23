@@ -35,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
 
+    boolean left = false;
+    boolean right = false;
+    boolean forward = false;
+    boolean backwards = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,11 +49,18 @@ public class MainActivity extends AppCompatActivity {
         ButtonForward = (Button) this.findViewById(R.id.ButtonForward);
         ButtonBack = (Button) this.findViewById(R.id.ButtonBack);
 
+
+
+
         // bluetooth connection
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (btAdapter == null) {
             // device does not support bluetooth
+            Context context = getApplicationContext();
+            Toast toast = Toast.makeText(context, "Device does not support bluetooth", Toast.LENGTH_SHORT);
+            toast.show();
+
 
         }
         else {
@@ -62,10 +74,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         /**
-         * MOVING WILL BE DONE USING WASD
-         *   W    |   ^
-         * A S D  | < v >
-         *
+         * MOVING WILL BE DONE USING THE FOLLOWING CHARS
+         * Q W E  |   ^
+         * A   D  | < v >
+         * Z S C
          *
          */
         // Button for setting motor power positive
@@ -75,11 +87,21 @@ public class MainActivity extends AppCompatActivity {
                 // set power forward
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        forward = true;
 
-                        sendData("w");
+                        if (left){
+                            sendData("q");
+                        }
+                        else if (right) {
+                            sendData("e");
+                        }
+                        else {
+                            sendData("w");
+                        }
+
                         return true;
                     case MotionEvent.ACTION_UP:
-
+                        forward = false;
                         sendData("x");  // stop
                         return true;
                 }
@@ -92,11 +114,20 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        backwards = true;
+                        if (left) {
+                            sendData("z");
+                        }
+                        else if (right) {
+                            sendData("c");
+                        }
+                        else {
+                            sendData("s");
+                        }
 
-                        sendData("s");
                         return true;
                     case MotionEvent.ACTION_UP:
-
+                        backwards = false;
                         sendData("x");  // stop
                         return true;
                 }
@@ -112,11 +143,12 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        left = true;
 
                         sendData("a");
                         return true;
                     case MotionEvent.ACTION_UP:
-
+                        left = false;
                         sendData("x"); // stop
                         return true;
 
@@ -132,11 +164,12 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        right = true;
 
                         sendData("d");
                         return true;
                     case MotionEvent.ACTION_UP:
-
+                        right = false;
                         sendData("x");  // stop
                         return true;
                 }
