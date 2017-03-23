@@ -1,30 +1,22 @@
 package com.bluetoothcontroller.bluetoothcontroller;
 
+import io.github.controlwear.virtual.joystick.android.JoystickView;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.UUID;
 
+
 public class MainActivity extends AppCompatActivity {
-    Button ButtonLeft;
-    Button ButtonRight;
-    Button ButtonForward;
-    Button ButtonBack; //backwards
+
     // bluetooth connection
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
@@ -35,21 +27,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
 
-    boolean left = false;
-    boolean right = false;
-    boolean forward = false;
-    boolean backwards = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButtonLeft = (Button) this.findViewById(R.id.ButtonLeft);
-        ButtonRight = (Button) this.findViewById(R.id.ButtonRight);
-        ButtonForward = (Button) this.findViewById(R.id.ButtonForward);
-        ButtonBack = (Button) this.findViewById(R.id.ButtonBack);
 
-
+        // joystick to control movement
+        JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
 
 
         // bluetooth connection
@@ -74,108 +59,60 @@ public class MainActivity extends AppCompatActivity {
 
 
         /**
-         * MOVING WILL BE DONE USING THE FOLLOWING CHARS
-         * Q W E  |   ^
-         * A   D  | < v >
-         * Z S C
+         * Movement will be done using a Joystick
          *
          */
-        // Button for setting motor power positive
-        ButtonForward.setOnTouchListener(new View.OnTouchListener() {
+
+        // get the movement
+        joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // set power forward
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        forward = true;
-
-                        if (left){
-                            sendData("q");
-                        }
-                        else if (right) {
-                            sendData("e");
-                        }
-                        else {
-                            sendData("w");
-                        }
-
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        forward = false;
-                        sendData("x");  // stop
-                        return true;
-                }
-                return false;
-            }
-        });
-        // Button for setting the motor power negatively
-        ButtonBack.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        backwards = true;
-                        if (left) {
-                            sendData("z");
-                        }
-                        else if (right) {
-                            sendData("c");
-                        }
-                        else {
-                            sendData("s");
-                        }
-
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        backwards = false;
-                        sendData("x");  // stop
-                        return true;
+            public void onMove(int angle, int strength) {
+                // forward
+                if (angle <= 120 && angle > 60) {
+                    sendData("w");
                 }
 
-                return false;
+                // diag forward right
+                if (angle <= 60 && angle > 30) {
+                    sendData("e");
+
+                }
+
+                // right
+                if (angle <= 30 || angle > 330) {
+                    sendData("d");
+                }
+
+                // diag backward right
+                if (angle <= 330 && angle > 300) {
+                    sendData("c");
+                }
+
+                // backward
+                if (angle <= 300 && angle > 240) {
+                    sendData("s");
+                }
+
+                // diag backward left
+                if (angle <= 240 && angle > 210) {
+                    sendData("z");
+                }
+
+                // left
+                if (angle <= 210 && angle > 150) {
+                    sendData("a");
+                }
+
+                // diag forward left
+                if (angle <= 150 && angle > 120) {
+                    sendData("q");
+                }
 
             }
         });
 
-        // Button for turning left
-        ButtonLeft.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        left = true;
 
-                        sendData("a");
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        left = false;
-                        sendData("x"); // stop
-                        return true;
 
-                }
-
-                return false;
-            }
-        });
-
-        // button for turning right
-        ButtonRight.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        right = true;
-
-                        sendData("d");
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        right = false;
-                        sendData("x");  // stop
-                        return true;
-                }
-                return false;
-            }
-        });
 
 
 
