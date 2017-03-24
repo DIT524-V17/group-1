@@ -2,34 +2,69 @@
 
 char rData;
 
+const int TRIGER_ODOL_PIN = 2;
+const int TRIGER_ODOR_PIN = 3;
 const int TRIGGER_PIN = 6;
 const int ECHO_PIN = 5;
 
 Car car;
-SR04 US;
-int lSpeed;
-int rSpeed;
 
-void setup() {
-  Serial.begin(9600);
-  US.attach(TRIGGER_PIN, ECHO_PIN);
-  car.begin();
+Odometer odoLeft;
+Odometer odoRight;
+
+SR04 US;
+int lSpeed = 15;
+int rSpeed = 15;
+
+void increaseSpeed(){
+  while(lSpeed < 99 && rSpeed < 99){
+    lSpeed += 5;
+    rSpeed += 5;
+    break;
+  }
 }
 
+void decreaseSpeed(){
+  while(lSpeed > 15 && rSpeed > 15){
+    lSpeed -= 5;
+    rSpeed -= 5;
+    break;
+  }
+}
+
+void avarageSpeed(){
+  //float avarage = (odoLeft.getSpeed() + odoRight.getSpeed())/2;
+  //Serial.print(avarage);
+}
 void moveFor(int lSpeed, int rSpeed){
   car.setMotorSpeed(lSpeed, rSpeed);
+  avarageSpeed();
+  
 }
 
 void moveBack(int lSpeed, int rSpeed){
   car.setMotorSpeed(lSpeed, rSpeed);
+  avarageSpeed();
 }
 void turn(int lSpeed, int rSpeed){
   car.setMotorSpeed(lSpeed, rSpeed);
+  avarageSpeed();
 }
 void eStop(int lSpeed, int rSpeed){
   car.setMotorSpeed(-lSpeed, -rSpeed);
   delay(100);
   car.setMotorSpeed(0, 0);
+  avarageSpeed();
+}
+
+void setup() {
+  Serial.begin(9600);
+  US.attach(TRIGGER_PIN, ECHO_PIN);
+  car.begin();
+  odoLeft.attach(TRIGER_ODOL_PIN);
+  odoRight.attach(TRIGER_ODOR_PIN);
+  odoLeft.begin();
+  odoRight.begin();
 }
 
 void loop() {
@@ -37,6 +72,19 @@ void loop() {
   if(Serial.available() > 0) {
     
     rData = Serial.read();
+
+//    if(rData == 'm'){
+//      increaseSpeed();
+//      Serial.println(lSpeed);
+//      moveFor(lSpeed,rSpeed);
+//      
+//    }
+//
+//    if(rData == 'k'){
+//      decreaseSpeed();
+//      Serial.println(lSpeed);
+//      moveFor(lSpeed,rSpeed);
+//    }
   
     if(rData == 'q'){         //diagonal forward left turn
       lSpeed = 20;
