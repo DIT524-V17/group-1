@@ -7,6 +7,8 @@ const int ECHO_PIN = 5;
 
 Car car;
 SR04 US;
+int lSpeed;
+int rSpeed;
 
 void setup() {
   Serial.begin(9600);
@@ -37,31 +39,47 @@ void loop() {
     rData = Serial.read();
   
     if(rData == 'q'){         //diagonal forward left turn
-      moveFor(20, 50);
+      int lSpeed = 20;
+      int rSpeed = 50;
+      moveFor(lSpeed,rSpeed);
     }
     if(rData == 'e'){       //diagonal forward right turn
-      moveFor(50, 20);
+      int lSpeed = 50;
+      int rSpeed = 20;
+      moveFor(lSpeed, rSpeed);
     }
     if(rData == 'c'){      //diagonal backward right turn
-      moveBack(-50, -20);
+      int lSpeed = -50;
+      int rSpeed = -20;
+      moveBack(lSpeed, rSpeed);
     }
     if(rData == 'z'){     //diagonal backward left turn
-      moveBack(-20, -50);
+      int lSpeed = -20;
+      int rSpeed = -50;
+      moveBack(lSpeed, rSpeed);
     }
     if(rData == 'w'){                  //move forward
-      moveFor(50, 50);
+      int lSpeed = 50;
+      int rSpeed = 50;
+      moveFor(lSpeed, rSpeed);
     }
     else if(rData == 's'){            //move backward
-      moveBack(-50, -50);
+      int lSpeed = -50;
+      int rSpeed = -50;
+      moveBack(lSpeed, rSpeed);
     }
     else if(rData == 'a'){            //turn in-place to the left (more of a drift in place)
-      turn(-50, 50);
+      int lSpeed = -50;
+      int rSpeed = 50;
+      turn(lSpeed, rSpeed);
     }
     else if(rData == 'd'){            //turn in-place to the right (more of a drift in place)
-      turn(50, -50);
+      int lSpeed = 50;
+      int rSpeed = -50;
+      turn(lSpeed, rSpeed);
     }
     else if(rData == 'x'){            //turn in-place to the right (more of a drift in place)
-      turn(0, 0);
+      eStop(lSpeed, rSpeed);
     }
   }
 }
