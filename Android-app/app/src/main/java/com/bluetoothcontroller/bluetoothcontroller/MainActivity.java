@@ -9,8 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
@@ -21,11 +23,16 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
+    private InputStream inputStream = null;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     // bluetooth module MAC address
     private static String MACaddress = "20:15:10:20:14:09";
-
+    // send BT enable request
     private static final int REQUEST_ENABLE_BT = 1;
+
+    // Display angle and power
+    private TextView angleText = null;
+    private TextView powerText = null;
 
 
     @Override
@@ -35,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         // joystick to control movement
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
-
+        final TextView angleText = (TextView) findViewById(R.id.angleText);
+        final TextView powerText = (TextView) findViewById(R.id.powerText);
 
         // bluetooth connection
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -67,45 +75,60 @@ public class MainActivity extends AppCompatActivity {
         joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
             @Override
             public void onMove(int angle, int strength) {
-                // forward
-                if (angle <= 120 && angle > 60) {
-                    sendData("w");
-                }
+                String powerString = "Power: " + strength;
+                // Make sure strength is not 0
+                if (strength > 15) {
+                    powerText.setText(powerString);
+                    // forward
+                    if (angle <= 120 && angle > 60) {
+                        angleText.setText("↑");
+                        sendData("w");
+                    }
 
-                // diag forward right
-                if (angle <= 60 && angle > 30) {
-                    sendData("e");
+                    // diag forward right
+                    if (angle <= 60 && angle > 30) {
+                        angleText.setText("↗");
+                        sendData("e");
 
-                }
+                    }
 
-                // right
-                if (angle <= 30 || angle > 330) {
-                    sendData("d");
-                }
+                    // right
+                    if (angle <= 30 || angle > 330) {
+                        angleText.setText("→");
+                        sendData("d");
+                    }
 
-                // diag backward right
-                if (angle <= 330 && angle > 300) {
-                    sendData("c");
-                }
+                    // diag backward right
+                    if (angle <= 330 && angle > 300) {
+                        angleText.setText("↘");
+                        sendData("c");
+                    }
 
-                // backward
-                if (angle <= 300 && angle > 240) {
-                    sendData("s");
-                }
+                    // backward
+                    if (angle <= 300 && angle > 240) {
+                        angleText.setText("↓");
+                        sendData("s");
+                    }
 
-                // diag backward left
-                if (angle <= 240 && angle > 210) {
-                    sendData("z");
-                }
+                    // diag backward left
+                    if (angle <= 240 && angle > 210) {
+                        angleText.setText("↙");
+                        sendData("z");
+                    }
 
-                // left
-                if (angle <= 210 && angle > 150) {
-                    sendData("a");
-                }
+                    // left
+                    if (angle <= 210 && angle > 150) {
+                        angleText.setText("←");
+                        sendData("a");
+                    }
 
-                // diag forward left
-                if (angle <= 150 && angle > 120) {
-                    sendData("q");
+                    // diag forward left
+                    if (angle <= 150 && angle > 120) {
+                        angleText.setText("↖");
+                        sendData("q");
+                    }
+                } else {
+                    sendData("x");
                 }
 
             }
