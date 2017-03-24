@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMove(int angle, int strength) {
                 String powerString = "Power: " + strength;
+                String sendPower = "" + strength;
                 // Make sure strength is not 0
                 if (strength > 15) {
                     powerText.setText(powerString);
@@ -83,12 +84,14 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 120 && angle > 60) {
                         angleText.setText("↑");
                         sendData("w");
+                        //sendSpeed(sendPower);
                     }
 
                     // diag forward right
                     if (angle <= 60 && angle > 30) {
                         angleText.setText("↗");
                         sendData("e");
+                        //sendSpeed(sendPower);
 
                     }
 
@@ -96,48 +99,50 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 30 || angle > 330) {
                         angleText.setText("→");
                         sendData("d");
+                        //sendSpeed(sendPower);
                     }
 
                     // diag backward right
                     if (angle <= 330 && angle > 300) {
                         angleText.setText("↘");
                         sendData("c");
+                        //sendSpeed(sendPower);
                     }
 
                     // backward
                     if (angle <= 300 && angle > 240) {
                         angleText.setText("↓");
                         sendData("s");
+                        //sendSpeed(sendPower);
                     }
 
                     // diag backward left
                     if (angle <= 240 && angle > 210) {
                         angleText.setText("↙");
                         sendData("z");
+                        //sendSpeed(sendPower);
                     }
 
                     // left
                     if (angle <= 210 && angle > 150) {
                         angleText.setText("←");
                         sendData("a");
+                        //sendSpeed(sendPower);
                     }
 
                     // diag forward left
                     if (angle <= 150 && angle > 120) {
                         angleText.setText("↖");
                         sendData("q");
+                        //sendSpeed(sendPower);
                     }
                 } else {
+                    // send "stop" signal
                     sendData("x");
                 }
 
             }
         });
-
-
-
-
-
 
     }
 
@@ -204,10 +209,25 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+
+    // To be used to send how fast the speed should be
+    private void sendSpeed(String send) {
+        if (btSocket != null) {
+            try {
+                btSocket.getOutputStream().write(send.getBytes());
+                btSocket.getOutputStream().flush();
+            }
+            catch (IOException e) {
+
+            }
+        }
+    }
+    // send the character for what direction to drive
     private void sendData(String send) {
         if (btSocket != null) {
             try {
                 btSocket.getOutputStream().write(send.getBytes());
+                btSocket.getOutputStream().flush();
             }
             catch (IOException e) {
 
