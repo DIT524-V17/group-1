@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     // Display angle and power
     private TextView angleText = null;
     private TextView powerText = null;
+    private TextView speedText = null;
 
 
     @Override
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
         final TextView angleText = (TextView) findViewById(R.id.angleText);
         final TextView powerText = (TextView) findViewById(R.id.powerText);
+        final TextView speedText = (TextView) findViewById(R.id.speedText);
 
         // bluetooth connection
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -64,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+
+        String display = readSpeed();
+        speedText.setText(display);
 
 
         /**
@@ -136,9 +141,6 @@ public class MainActivity extends AppCompatActivity {
                         sendData("q");
                         //sendSpeed(sendPower);
                     }
-                } else {
-                    // send "stop" signal
-                    sendData("x");
                 }
 
             }
@@ -234,6 +236,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    // read speed data
+    private String readSpeed() {
+        String string = null;
+        if (btSocket != null) {
+            try {
+                inputStream = btSocket.getInputStream();
+                string = Integer.toString(inputStream.read());
+
+
+            } catch (IOException e) {
+                // no btSocket
+                string = "null";
+            }
+
+        }
+        return string;
     }
 
 
