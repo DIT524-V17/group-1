@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView powerText = null;
     private TextView speedText = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+        
 
 
         /**
@@ -94,8 +94,9 @@ public class MainActivity extends AppCompatActivity {
                     powerText.setText(powerString);
                     // forward
                     if (angle <= 120 && angle > 60) {
-                        angleText.setText("↑");
-                        sendData("w");
+                        angleText.setText("â†‘");
+                        
+                        sendData("w" + strength+ "");
                         //sendSpeed(strength);
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
@@ -103,8 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
                     // diag forward right
                     if (angle <= 60 && angle > 30) {
-                        angleText.setText("↗");
-                        sendData("e");
+                        angleText.setText("â†—");
+                        sendData("e" +  strength+ "");
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
 
@@ -112,48 +113,48 @@ public class MainActivity extends AppCompatActivity {
 
                     // right
                     if (angle <= 30 || angle > 330) {
-                        angleText.setText("→");
-                        sendData("d");
+                        angleText.setText("â†’");
+                        sendData("d" + strength+ "");
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
                     // diag backward right
                     if (angle <= 330 && angle > 300) {
-                        angleText.setText("↘");
-                        sendData("c");
+                        angleText.setText("â†˜");
+                        sendData("c" + strength+ "");
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
                     // backward
                     if (angle <= 300 && angle > 240) {
-                        angleText.setText("↓");
-                        sendData("s");
+                        angleText.setText("â†“");
+                        sendData("s" + strength+ "");
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
                     // diag backward left
                     if (angle <= 240 && angle > 210) {
-                        angleText.setText("↙");
-                        sendData("z");
+                        angleText.setText("â†™");
+                        sendData("z" + strength+ "");
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
                     // left
                     if (angle <= 210 && angle > 150) {
-                        angleText.setText("←");
-                        sendData("a");
+                        angleText.setText("â†�");
+                        sendData("a" + strength+ "");
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
                     // diag forward left
                     if (angle <= 150 && angle > 120) {
-                        angleText.setText("↖");
-                        sendData("q");
+                        angleText.setText("â†–");
+                        sendData("q" + strength+ "");
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
