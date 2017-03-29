@@ -40,6 +40,15 @@
         android:layout_toEndOf="@+id/powerText"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/powerText" />
+    <TextView
+        android:id="@+id/speedText"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/angleText"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/angleText"
+        />
 
 
 </RelativeLayout>

@@ -7,13 +7,19 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Scanner;
 import java.util.UUID;
 
 
@@ -33,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     // Display angle and power
     private TextView angleText = null;
     private TextView powerText = null;
+    private TextView speedText = null;
 
 
     @Override
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
         final TextView angleText = (TextView) findViewById(R.id.angleText);
         final TextView powerText = (TextView) findViewById(R.id.powerText);
+        final TextView speedText = (TextView) findViewById(R.id.speedText);
 
         // bluetooth connection
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -71,12 +79,16 @@ public class MainActivity extends AppCompatActivity {
          *
          */
 
+
+
         // get the movement
         joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
             @Override
             public void onMove(int angle, int strength) {
                 String powerString = "Power: " + strength;
-                String sendPower = "" + strength;
+
+
+
                 // Make sure strength is not 0
                 if (strength > 15) {
                     powerText.setText(powerString);
@@ -84,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 120 && angle > 60) {
                         angleText.setText("↑");
                         sendData("w");
+                        //sendSpeed(strength);
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
@@ -91,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 60 && angle > 30) {
                         angleText.setText("↗");
                         sendData("e");
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
 
                     }
@@ -99,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 30 || angle > 330) {
                         angleText.setText("→");
                         sendData("d");
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
@@ -106,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 330 && angle > 300) {
                         angleText.setText("↘");
                         sendData("c");
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
@@ -113,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 300 && angle > 240) {
                         angleText.setText("↓");
                         sendData("s");
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
@@ -120,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 240 && angle > 210) {
                         angleText.setText("↙");
                         sendData("z");
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
@@ -127,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 210 && angle > 150) {
                         angleText.setText("←");
                         sendData("a");
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
 
@@ -134,10 +154,12 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 150 && angle > 120) {
                         angleText.setText("↖");
                         sendData("q");
+                        speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
-                } else {
-                    // send "stop" signal
+                }
+                else {
+
                     sendData("x");
                 }
 
@@ -211,10 +233,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     // To be used to send how fast the speed should be
-    private void sendSpeed(String send) {
+    private void sendSpeed(int send) {
         if (btSocket != null) {
             try {
-                btSocket.getOutputStream().write(send.getBytes());
+                btSocket.getOutputStream().write(send);
                 btSocket.getOutputStream().flush();
             }
             catch (IOException e) {
@@ -234,6 +256,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+
+
+    // read speed data
+    private String readSpeed()  {
+        String s = "";
+        try {
+            InputStream in = btSocket.getInputStream();
+            float f = in.read();
+
+            s = Float.toString(f);
+        }
+        catch (IOException e) {
+
+        }
+        return s;
     }
 
 
