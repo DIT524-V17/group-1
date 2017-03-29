@@ -1,6 +1,6 @@
 #include <Smartcar.h>
 
-char rData;
+//char rData;
 
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
@@ -15,6 +15,8 @@ Odometer odoRight;
 SR04 US;
 int lSpeed = 15;
 int rSpeed = 15;
+char rData[3];
+int S;
 
 void increaseSpeed(){
   while(lSpeed < 99 && rSpeed < 99){
@@ -31,6 +33,14 @@ void decreaseSpeed(){
     break;
   }
 }
+void extract(){
+  String Stemp = rData[1] + rData[2]+"";
+  int S = Stemp.toInt();
+//return S;
+//for (int i = 0; i < 3; i = i ++) {
+ //rData[i] = Serial.read();
+}
+  
 
 void avarageSpeed(){
   //float avarage = (odoLeft.getSpeed() + odoRight.getSpeed())/2;
@@ -71,7 +81,7 @@ void loop() {
   
   if(Serial.available() > 0) {
     
-    rData = Serial.read();
+//    rData = Serial.read();
 
 //    if(rData == 'm'){
 //      increaseSpeed();
@@ -85,48 +95,53 @@ void loop() {
 //      Serial.println(lSpeed);
 //      moveFor(lSpeed,rSpeed);
 //    }
-  
-    if(rData == 'q'){         //diagonal forward left turn
-      lSpeed = 20;
-      rSpeed = 50;
+  for (int i = 0; i < 3; i = i ++) {
+    rData[i] = Serial.read();
+  }
+ 
+ extract();
+    if(rData[0] == 'q'){         //diagonal forward left turn
+      lSpeed = S/2;
+      rSpeed = S;
       moveFor(lSpeed,rSpeed);
+      
     }
-    if(rData == 'e'){       //diagonal forward right turn
-      lSpeed = 50;
-      rSpeed = 20;
+    if(rData[0] == 'e'){       //diagonal forward right turn
+      lSpeed = S;
+      rSpeed = S/2;
       moveFor(lSpeed, rSpeed);
     }
-    if(rData == 'c'){      //diagonal backward right turn
-      lSpeed = -50;
-      rSpeed = -20;
+    if(rData[0] == 'c'){      //diagonal backward right turn
+      lSpeed = -S;
+      rSpeed = -(S/2);
       moveBack(lSpeed, rSpeed);
     }
-    if(rData == 'z'){     //diagonal backward left turn
-      lSpeed = -20;
-      rSpeed = -50;
+    if(rData[0] == 'z'){     //diagonal backward left turn
+      lSpeed = -(S/2);
+      rSpeed = -S;
       moveBack(lSpeed, rSpeed);
     }
-    if(rData == 'w'){                  //move forward
-      lSpeed = 50;
-      rSpeed = 50;
+    if(rData[0]== 'w'){                  //move forward
+      lSpeed = S;
+      rSpeed = S;
       moveFor(lSpeed, rSpeed);
     }
-    else if(rData == 's'){            //move backward
-      lSpeed = -50;
-      rSpeed = -50;
+    else if(rData[0] == 's'){            //move backward
+      lSpeed = -S;
+      rSpeed = -S;
       moveBack(lSpeed, rSpeed);
     }
-    else if(rData == 'a'){            //turn in-place to the left (more of a drift in place)
-      lSpeed = -50;
-      rSpeed = 50;
+    else if(rData[0] == 'a'){            //turn in-place to the left (more of a drift in place)
+      lSpeed = -S;
+      rSpeed = S;
       turn(lSpeed, rSpeed);
     }
-    else if(rData == 'd'){            //turn in-place to the right (more of a drift in place)
-      lSpeed = 50;
-      rSpeed = -50;
+    else if(rData[0] == 'd'){            //turn in-place to the right (more of a drift in place)
+      lSpeed = S;
+      rSpeed = -S;
       turn(lSpeed, rSpeed);
     }
-    else if(rData == 'x'){            //stops
+    else if(rData[0] == 'x'){            //stops
       eStop(lSpeed, rSpeed);
     }
   }
