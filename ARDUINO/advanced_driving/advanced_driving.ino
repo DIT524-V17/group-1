@@ -139,6 +139,7 @@ void loop() {
 
       case 'x' :                //Stop
         eStop(lSpeed, rSpeed);
+        break;
 
       default :
         Serial.print("The smartCar doesn't move!");
