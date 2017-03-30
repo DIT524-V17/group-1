@@ -81,26 +81,69 @@ void loop() {
   
   if(Serial.available() > 0) {
     
-//    rData = Serial.read();
 
-//    if(rData == 'm'){
-//      increaseSpeed();
-//      Serial.println(lSpeed);
-//      moveFor(lSpeed,rSpeed);
-//      
-//    }
-//
-//    if(rData == 'k'){
-//      decreaseSpeed();
-//      Serial.println(lSpeed);
-//      moveFor(lSpeed,rSpeed);
-//    }
   for (int i = 0; i < 3; i = i ++) {
     rData[i] = Serial.read();
   }
- 
+ char y = rData[0];
  extract();
-    if(rData[0] == 'q'){         //diagonal forward left turn
+ switch(y){
+  case 'w' :                         //move forward
+      lSpeed = S;
+      rSpeed = S;
+      moveFor(lSpeed, rSpeed);
+      break;
+      
+  case 's' :                        //move backward
+      lSpeed = -S;
+      rSpeed = -S;
+      moveBack(lSpeed, rSpeed);
+      break;
+      
+  case 'a' :                       //turn in-place to the left (more of a drift in place)
+      lSpeed = -S;
+      rSpeed = S;
+      turn(lSpeed, rSpeed); 
+      break;
+
+  case 'd' :                      //turn in-place to the right (more of a drift in place)
+      lSpeed = S;
+      rSpeed = -S;
+      turn(lSpeed, rSpeed);
+      break;
+
+  case 'q' :                     //diagonal forward left turn
+      lSpeed = S/2;
+      rSpeed = S;
+      moveFor(lSpeed,rSpeed);
+      break;
+
+  case 'e' :                    //diagonal forward right turn
+      lSpeed = S; 
+      rSpeed = S/2;
+      moveFor(lSpeed, rSpeed);
+      break;
+
+      
+  case 'z' :                  //diagonal backward left turn
+      lSpeed = -(S/2);
+      rSpeed = -S;
+      moveBack(lSpeed, rSpeed);
+      break;
+
+  case 'c' :                 //diagonal backward right turn
+      lSpeed = -S;
+      rSpeed = -(S/2);
+      moveBack(lSpeed, rSpeed);
+      break;
+
+   case 'x' :                //Stop
+      eStop(lSpeed, rSpeed);
+  
+  }
+ }
+ }
+   /* if(rData[0] == 'q'){         //diagonal forward left turn
       lSpeed = S/2;
       rSpeed = S;
       moveFor(lSpeed,rSpeed);
@@ -144,5 +187,19 @@ void loop() {
     else if(rData[0] == 'x'){            //stops
       eStop(lSpeed, rSpeed);
     }
-  }
-}
+  } 
+      rData = Serial.read();
+
+//    if(rData == 'm'){
+//      increaseSpeed();
+//      Serial.println(lSpeed);
+//      moveFor(lSpeed,rSpeed);
+//      
+//    }
+//
+//    if(rData == 'k'){
+//      decreaseSpeed();
+//      Serial.println(lSpeed);
+//      moveFor(lSpeed,rSpeed);
+    }*/
+
