@@ -12,19 +12,6 @@
     android:splitMotionEvents="true"
     tools:context="com.bluetoothcontroller.bluetoothcontroller.MainActivity">
 
-    <io.github.controlwear.virtual.joystick.android.JoystickView
-        android:id="@+id/joystickView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        custom:JV_buttonColor="#000f3b"
-        custom:JV_borderColor="#29302f"
-        custom:JV_backgroundColor="#006c62"
-        custom:JV_borderWidth="4dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="41dp" />
-
     <TextView
         android:id="@+id/powerText"
         android:gravity="center_horizontal"
@@ -49,6 +36,26 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/angleText"
         />
+
+    <io.github.controlwear.virtual.joystick.android.JoystickView
+        android:id="@+id/joystickView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        custom:JV_buttonColor="#000f3b"
+        custom:JV_borderColor="#29302f"
+        custom:JV_backgroundColor="#006c62"
+        custom:JV_borderWidth="4dp"
+        android:layout_below="@+id/speedText"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="101dp" />
+
+    <VideoView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/speedText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="63dp"
+        android:id="@+id/videoView2" />
 
 
 </RelativeLayout>

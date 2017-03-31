@@ -1,25 +1,27 @@
+// Package
 package com.bluetoothcontroller.bluetoothcontroller;
 
+// Joystickview
+// source: https://github.com/controlwear/virtual-joystick-android
 import io.github.controlwear.virtual.joystick.android.JoystickView;
-
+// Android imports
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Process;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+// Java imports
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Scanner;
 import java.util.UUID;
 
 
@@ -41,6 +43,33 @@ public class MainActivity extends AppCompatActivity {
     private TextView powerText = null;
     private TextView speedText = null;
 
+    //
+    VideoView videoView;
+
+    /**
+     * Livestream video
+     *
+     * Call this method to start streaming from liveUrl
+     */
+    private void streamVideo() {
+        // Url to stream from
+        String liveUrl = "https://www.twitch.tv/joshog";
+
+        videoView = (VideoView) findViewById(R.id.videoView2);
+        videoView.setVideoURI(Uri.parse(liveUrl));
+
+        // Set Media controller for the videoView
+        MediaController mediaController = new MediaController(this);
+        videoView.setMediaController(mediaController);
+
+        videoView.requestFocus();
+        videoView.start();
+
+
+
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
 
         // joystick to control movement
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
+        // video view
+        final VideoView videoView = (VideoView) findViewById(R.id.videoView2);
+        // All text views
         final TextView angleText = (TextView) findViewById(R.id.angleText);
         final TextView powerText = (TextView) findViewById(R.id.powerText);
         final TextView speedText = (TextView) findViewById(R.id.speedText);
@@ -56,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         // bluetooth connection
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        // check if Bluetooth adapter exists
         if (btAdapter == null) {
             // device does not support bluetooth
             Context context = getApplicationContext();
@@ -78,16 +111,11 @@ public class MainActivity extends AppCompatActivity {
          * Movement will be done using a Joystick
          *
          */
-
-
-
         // get the movement
         joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
             @Override
             public void onMove(int angle, int strength) {
                 String powerString = "Power: " + strength;
-
-
 
                 // Make sure strength is not 0
                 if (strength > 15) {
@@ -159,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else {
-
+                    // stop when nothing is held down
                     sendData("x");
                 }
 
@@ -189,10 +217,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
+        // resume app
         super.onResume();
         BluetoothDevice device = btAdapter.getRemoteDevice(MACaddress);
 
 
+        // create bluetooth socket
         try {
             btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
 
@@ -225,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // Exit the app with an error message
     private void errorExit(String title, String message) {
         Toast msg = Toast.makeText(getBaseContext(), title + " : " + message, Toast.LENGTH_LONG);
         msg.show();
@@ -245,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     // send the character for what direction to drive
+    // will have to be combined with sendspeed, since its serial communications
     private void sendData(String send) {
         if (btSocket != null) {
             try {
@@ -258,9 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-    // read speed data
+    // read speed data, from cars odometers
     private String readSpeed()  {
         String s = "";
         try {
