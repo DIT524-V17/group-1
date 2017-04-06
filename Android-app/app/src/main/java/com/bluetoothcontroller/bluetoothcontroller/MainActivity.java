@@ -3,26 +3,28 @@ package com.bluetoothcontroller.bluetoothcontroller;
 
 // Joystickview
 // source: https://github.com/controlwear/virtual-joystick-android
-import io.github.controlwear.virtual.joystick.android.JoystickView;
-// Android imports
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-// Java imports
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
+
+import io.github.controlwear.virtual.joystick.android.JoystickView;
+
+// Android imports
+// Java imports
 
 
 public class MainActivity extends AppCompatActivity {
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                     if (angle <= 120 && angle > 60) {
                         angleText.setText("â†‘");
                         
-                        sendData("w" + strength+ "");
+                        sendData("w" + String.valueOf(strength));
                         //sendSpeed(strength);
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     // diag forward right
                     if (angle <= 60 && angle > 30) {
                         angleText.setText("â†—");
-                        sendData("e" +  strength+ "");
+                        sendData("e" +  String.valueOf(strength));
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
 
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     // right
                     if (angle <= 30 || angle > 330) {
                         angleText.setText("â†’");
-                        sendData("d" + strength+ "");
+                        sendData("d" + String.valueOf(strength));
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                     // diag backward right
                     if (angle <= 330 && angle > 300) {
                         angleText.setText("â†˜");
-                        sendData("c" + strength+ "");
+                        sendData("c" + String.valueOf(strength));
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                     // backward
                     if (angle <= 300 && angle > 240) {
                         angleText.setText("â†“");
-                        sendData("s" + strength+ "");
+                        sendData("s" + String.valueOf(strength));
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
@@ -147,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     // diag backward left
                     if (angle <= 240 && angle > 210) {
                         angleText.setText("â†™");
-                        sendData("z" + strength+ "");
+                        sendData("z" + String.valueOf(strength));
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
@@ -155,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     // left
                     if (angle <= 210 && angle > 150) {
                         angleText.setText("â†�");
-                        sendData("a" + strength+ "");
+                        sendData("a" + String.valueOf(strength));
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
@@ -163,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                     // diag forward left
                     if (angle <= 150 && angle > 120) {
                         angleText.setText("â†–");
-                        sendData("q" + strength+ "");
+                        sendData("q" + String.valueOf(strength));
                         speedText.setText(readSpeed());
                         //sendSpeed(sendPower);
                     }
