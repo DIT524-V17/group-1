@@ -43,42 +43,22 @@ public class MainActivity extends AppCompatActivity {
     private TextView powerText = null;
     private TextView speedText = null;
 
-    //
     VideoView videoView;
 
-    /**
-     * Livestream video
-     *
-     * Call this method to start streaming from liveUrl
-     */
-    private void streamVideo() {
-        // Url to stream from
-        String liveUrl = "https://www.twitch.tv/joshog";
-
-        videoView = (VideoView) findViewById(R.id.videoView2);
-        videoView.setVideoURI(Uri.parse(liveUrl));
-
-        // Set Media controller for the videoView
-        MediaController mediaController = new MediaController(this);
-        videoView.setMediaController(mediaController);
-
-        videoView.requestFocus();
-        videoView.start();
+    //
 
 
 
-
-    }
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // joystick to control movement
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
         // video view
-        final VideoView videoView = (VideoView) findViewById(R.id.videoView2);
+        videoView = (VideoView) findViewById(R.id.videoView2);
         // All text views
         final TextView angleText = (TextView) findViewById(R.id.angleText);
         final TextView powerText = (TextView) findViewById(R.id.powerText);
@@ -104,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-        
+        streamVideo();
+
 
 
         /**
@@ -255,6 +236,37 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    /**
+     * Livestream video
+     *
+     * Call this method to start streaming from liveUrl
+     */
+    private void streamVideo() {
+        // Url to stream from
+        String liveUrl = "http://192.168.43.136:8082";
+
+        Uri uri = Uri.parse(liveUrl);
+
+        if (uri == null) {
+            // no stream
+            Toast.makeText(MainActivity.this, "No uri", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            videoView.setVideoPath(liveUrl);
+            //videoView.setVideoURI(uri);
+            // Set Media controller for the videoView
+            MediaController mediaController = new MediaController(this);
+            videoView.setMediaController(mediaController);
+            videoView.requestFocus();
+            //videoView.setZOrderOnTop(true);
+            videoView.start();
+
+        }
+
+
+    }
+
 
     // Exit the app with an error message
     private void errorExit(String title, String message) {
