@@ -8,9 +8,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,23 +48,28 @@ public class MainActivity extends AppCompatActivity {
     private TextView angleText = null;
     private TextView powerText = null;
     private TextView speedText = null;
+    WebView webView;
 
     VideoView videoView;
-
-    //
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            WebView.enableSlowWholeDocumentDraw();
+        }
 
         setContentView(R.layout.activity_main);
 
         // joystick to control movement
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
-        // video view
-        videoView = (VideoView) findViewById(R.id.videoView2);
+        //webView = new WebView(this);
+        //setContentView(webView);
+        webView = (WebView) findViewById(R.id.streamView);
+        webView.setWebViewClient(new WebViewClient());
+        webView.getSettings().setJavaScriptEnabled(true);
+
+
         // All text views
         final TextView angleText = (TextView) findViewById(R.id.angleText);
         final TextView powerText = (TextView) findViewById(R.id.powerText);
@@ -86,7 +95,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-        streamVideo();
+        // Url to stream from
+        String liveUrl = "http://192.168.43.118:8082";
+        String testUrl = "http://google.com";
+        webView.loadUrl(liveUrl);
+        webView.getSettings().setBuiltInZoomControls(true);
+
+
 
 
 
@@ -236,36 +251,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
         }
-
-    }
-
-    /**
-     * Livestream video
-     *
-     * Call this method to start streaming from liveUrl
-     */
-    private void streamVideo() {
-        // Url to stream from
-        String liveUrl = "http://192.168.43.136:8082";
-
-        Uri uri = Uri.parse(liveUrl);
-
-        if (uri == null) {
-            // no stream
-            Toast.makeText(MainActivity.this, "No uri", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            videoView.setVideoPath(liveUrl);
-            //videoView.setVideoURI(uri);
-            // Set Media controller for the videoView
-            MediaController mediaController = new MediaController(this);
-            videoView.setMediaController(mediaController);
-            videoView.requestFocus();
-            //videoView.setZOrderOnTop(true);
-            videoView.start();
-
-        }
-
 
     }
 
