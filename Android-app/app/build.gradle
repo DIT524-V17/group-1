@@ -28,6 +28,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'io.github.controlwear:virtualjoystick:1.0.1'
+    compile "de.mrmaffen:vlc-android-sdk:2.0.6"
     testCompile 'junit:junit:4.12'
     compile project(':vitamio')
 }
