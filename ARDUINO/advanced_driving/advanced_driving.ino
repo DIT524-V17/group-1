@@ -16,9 +16,6 @@ int rSpeed;
 String rData;
 
 // to split up the string and set 1. and 2. char of it as speed
-// Note: since we change from to read char to string it takes almost 2 sec for any movment
-// probably we need to fix this...
-
 int extract() {
   int carSpeed = rData.substring(1, 3).toInt();
   return carSpeed;
@@ -63,7 +60,12 @@ void loop() {
 
   if (Serial.available() > 0) {
 
-    rData = Serial.readString();
+    while (rData.length() < 3) {
+      char m = Serial.read();
+      rData += String(m);
+    }
+
+
     char y = rData.charAt(0);
 
     switch (y) {
@@ -123,6 +125,7 @@ void loop() {
         Serial.print("The smartCar doesn't move!");
         break;
     }
+    rData = "";
   }
 }
 
