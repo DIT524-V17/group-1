@@ -3,16 +3,22 @@ package com.bluetoothcontroller.bluetoothcontroller;
 
 // Joystickview
 // source: https://github.com/controlwear/virtual-joystick-android
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.MediaController;
@@ -20,18 +26,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.MediaPlayer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
-// Android imports
-// Java imports
 
+public class MainActivity extends AppCompatActivity implements IVLCVout.Callback {
+    private String vidUrl;
 
-public class MainActivity extends AppCompatActivity {
 
     // bluetooth connection
     private BluetoothAdapter btAdapter = null;
@@ -50,7 +61,20 @@ public class MainActivity extends AppCompatActivity {
     private TextView speedText = null;
     WebView webView;
 
-    VideoView videoView;
+
+    // stream from this ip using vlc media player
+    // stream from vlc using this command!
+    // raspivid -o - -n -t 0 | cvlc -vvv stream:///dev/stdin --sout '#standard{access=http,mux=ts,dst=:8090}' :demux=h264
+    private String mVideoUrl = "http://192.168.43.118:8090";
+
+    // media player
+    private LibVLC libvlc;
+    private VideoView videoView;
+
+    private MediaPlayer mMediaPlayer = null;
+    private int mVideoWidth;
+    private int mVideoHeight;
+    private final static int VideoSizeChanged = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +82,23 @@ public class MainActivity extends AppCompatActivity {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             WebView.enableSlowWholeDocumentDraw();
         }
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
 
+        videoView = (VideoView) findViewById(R.id.videoView);
+        //mVideoUrl = getIntent().getExtras().getString("videoUrl");
+
         // joystick to control movement
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
+
+        // webview
         //webView = new WebView(this);
         //setContentView(webView);
-        webView = (WebView) findViewById(R.id.streamView);
-        webView.setWebViewClient(new WebViewClient());
-        webView.getSettings().setJavaScriptEnabled(true);
+        //webView = (WebView) findViewById(R.id.streamView);
+        //webView.setWebViewClient(new WebViewClient());
+        //webView.getSettings().setJavaScriptEnabled(true);
 
 
         // All text views
@@ -95,12 +126,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+        /**
         // Url to stream from
         String liveUrl = "http://192.168.43.118:8082";
         String testUrl = "http://google.com";
         webView.loadUrl(liveUrl);
         webView.getSettings().setBuiltInZoomControls(true);
-
+         */
 
 
 
@@ -212,6 +244,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e2) {
             errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
         }
+        releasePlayer();
+
     }
 
     @Override
@@ -251,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
         }
+        createMediaPlayer();
 
     }
 
@@ -305,6 +340,191 @@ public class MainActivity extends AppCompatActivity {
         return s;
     }
 
+
+    // The following methods are required by vlc library
+    // https://github.com/mrmaffen/vlc-android-sdk/issues/18
+    // the link above was used as reference for these methods
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setSize(mVideoWidth, mVideoHeight);
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
+    }
+
+    private void setSize(int width, int height) {
+        mVideoWidth = width;
+        mVideoHeight = height;
+        if (mVideoWidth * mVideoHeight <= 1) {
+            return;
+        }
+
+
+        if (videoView == null || videoView == null) {
+            return;
+        }
+
+
+        // get screen size
+        int w = getWindow().getDecorView().getWidth();
+        int h = getWindow().getDecorView().getHeight();
+
+        // getWindow().getDecorView() doesn't always take orientation into
+        // account, we have to correct the values
+        boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        if (w > h && isPortrait || w < h && !isPortrait) {
+            int i = w;
+            w = h;
+            h = i;
+        }
+
+        float videoAR = (float) mVideoWidth / (float) mVideoHeight;
+        float screenAR = (float) w / (float) h;
+
+        if (screenAR < videoAR) {
+            h = (int) (w / videoAR);
+        }
+
+        else {
+            w = (int) (h * videoAR);
+        }
+
+
+        // force surface buffer size
+        videoView.getHolder().setFixedSize(mVideoWidth, mVideoHeight);
+
+        // set display size
+        ViewGroup.LayoutParams lp = videoView.getLayoutParams();
+        lp.width = w;
+        lp.height = h;
+        videoView.setLayoutParams(lp);
+        videoView.invalidate();
+
+    }
+
+    private void createMediaPlayer() {
+        releasePlayer();
+
+        try {
+            if (mVideoUrl.length() > 0) {
+                Toast toast = Toast.makeText(this, mVideoUrl, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0,
+                        0);
+                toast.show();
+            }
+
+            // Create LibVLC
+            ArrayList<String> options = new ArrayList<String>();
+            //options.add("--subsdec-encoding <encoding>");
+            options.add("--aout=opensles");
+            options.add("--audio-time-stretch"); // time stretching
+            options.add("-vvv"); // verbosity
+            libvlc = new LibVLC(this);
+            //libvlc = new LibVLC(options);
+
+
+            mMediaPlayer = new MediaPlayer(libvlc);
+            mMediaPlayer.setEventListener(mPlayerListener);
+
+            videoView.setVideoPath(mVideoUrl);
+            videoView.setVideoURI(Uri.parse(mVideoUrl));
+            videoView.setMediaController(new MediaController(this));
+            videoView.setOnPreparedListener(new android.media.MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(android.media.MediaPlayer mp) {
+                    Log.d("TAG", "OnPrepared called");
+                }
+            });
+
+            videoView.start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error creating player!", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    protected void releasePlayer() {
+        if (libvlc == null)
+            return;
+        mMediaPlayer.stop();
+        final IVLCVout vout = mMediaPlayer.getVLCVout();
+        vout.removeCallback(this);
+        vout.detachViews();
+        videoView = null;
+        libvlc.release();
+        libvlc = null;
+
+        mVideoWidth = 0;
+        mVideoHeight = 0;
+
+    }
+
+    private MediaPlayer.EventListener mPlayerListener = new MainActivity.MyPlayerListener(this);
+
+    @Override
+    public void onNewLayout(IVLCVout vout, int width, int height, int visibleWidth, int visibleHeight, int sarNum, int sarDen) {
+        if (width * height == 0)
+            return;
+
+        // store video size
+        mVideoWidth = width;
+        mVideoHeight = height;
+        setSize(mVideoWidth, mVideoHeight);
+
+    }
+
+    @Override
+    public void onSurfacesCreated(IVLCVout vout) {
+
+    }
+
+    @Override
+    public void onSurfacesDestroyed(IVLCVout vout) {
+
+    }
+
+    private static class MyPlayerListener implements MediaPlayer.EventListener {
+        private WeakReference mOwner;
+
+        public MyPlayerListener(MainActivity owner) {
+            mOwner = new WeakReference<MainActivity>(owner);
+        }
+
+        @Override
+        public void onEvent(MediaPlayer.Event event) {
+            MainActivity player = (MainActivity) mOwner.get();
+
+            switch (event.type) {
+                case MediaPlayer.Event.EndReached:
+                    //Log.d(TAG, "MediaPlayerEndReached");
+                    // player.releasePlayer();
+                    break;
+                case MediaPlayer.Event.Playing:
+                case MediaPlayer.Event.Paused:
+                case MediaPlayer.Event.Stopped:
+                default:
+                    break;
+            }
+        }
+
+    }
+
+    @Override
+    public void onHardwareAccelerationError(IVLCVout vout) {
+        // Handle errors with hardware acceleration
+        //Log.e(TAG, "Error with hardware acceleration");
+        this.releasePlayer();
+        Toast.makeText(this, "Error with hardware acceleration", Toast.LENGTH_LONG).show();
+    }
 
 
 }
