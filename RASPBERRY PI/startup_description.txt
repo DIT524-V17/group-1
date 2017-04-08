@@ -1,0 +1,8 @@
+* go to pi folder on terminal
+* create a script like as camera.sh
+* nano camera.sh
+* write your script in here, then ctrl x, enter y, enter
+* give the file root permission to file
+* sudo 777 camera.sh
+* run sudo nano .bashrc command on terminal
+* write ./camera.sh on the end of the line, then ctrl x, enter y, enter
