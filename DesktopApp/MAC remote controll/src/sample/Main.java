@@ -4,32 +4,30 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class Main extends Application {
 
-    Polygon UpTriangle = new Polygon();
-    Polygon DownTriangle = new Polygon();
-    Polygon RightTriangle = new Polygon();
-    Polygon LeftTriangle = new Polygon();
+
+
+public class Main extends Application {
 
     //Declare BT variables
     String url = "btspp://201510201409:1";
     final RemoteDevice[] hc05device = new RemoteDevice[1];
     final boolean[] scanFinished = {false};
+    boolean deviceFound = false;
 
     //declare gui variables
     Boolean moveCircle = false;
@@ -47,7 +45,8 @@ public class Main extends Application {
                     System.out.format("%s (%s)\n", name, btDevice.getBluetoothAddress());
                     if (name.matches("g1bt")) {
                         hc05device[0] = btDevice;
-                        System.out.println("got it!");
+                        deviceFound = true;
+                        //System.out.println("got it!"); //Used for debugging
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -73,6 +72,11 @@ public class Main extends Application {
             Thread.sleep(500);
         }
 
+        if (!deviceFound){
+            System.exit(0);
+            JOptionPane.showMessageDialog(null, "The application will quit as the car has not been found, restart once car is ready to connect.");
+        }
+
         StreamConnection con = (StreamConnection) Connector.open(url);
 
         OutputStream os = con.openOutputStream();
@@ -81,7 +85,6 @@ public class Main extends Application {
         RemoteDevice dev = RemoteDevice.getRemoteDevice(con);
 
         //os.write("w".getBytes()); //just send '1' to the device
-
 
         Group root = new Group();
         Scene scene = new Scene(root, 500, 600);
@@ -108,18 +111,21 @@ public class Main extends Application {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 moveCircle = false;
-                innerCircle.setCenterX(130);
-                innerCircle.setCenterY(90);
+                innerCircle.setCenterX(250);
+                innerCircle.setCenterY(300);
             }
         });
-        outerCircle.setCenterX(130);
-        outerCircle.setCenterY(90);
+
+        outerCircle.setCenterX(250);
+        outerCircle.setCenterY(300);
         outerCircle.setRadius(60);
-        innerCircle.setCenterX(130);
-        innerCircle.setCenterY(90);
+        innerCircle.setCenterX(250);
+        innerCircle.setCenterY(300);
         innerCircle.setRadius(20);
         outerCircle.setFill(Color.GREEN);
         innerCircle.setFill(Color.BLACK);
+
+
         g.getChildren().add(outerCircle);
         g.getChildren().add(innerCircle);
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -142,25 +148,66 @@ public class Main extends Application {
                 double x = outerCircle.getCenterX() - innerCircle.getCenterX();
                 double y = outerCircle.getCenterY() - innerCircle.getCenterY();
                 double angle = Math.atan2(y,x);
-                System.out.println(Math.toDegrees(angle));
+
+                //System.out.println(Math.toDegrees(angle));
+
+                try {
+                    switch (Double.toString(Math.toDegrees(angle))){
+                        case "0.0":
+                            os.write("a80".getBytes());
+                            break;
+                        case "45.0":
+                            os.write("q80".getBytes());
+                            break;
+                        case "90.0":
+                            os.write("w80".getBytes());
+                            break;
+                        case "135.0":
+                            os.write("e80".getBytes());
+                            break;
+                        case "180.0":
+                            os.write("d80".getBytes());
+                            break;
+                        case "-45.0":
+                            os.write("z80".getBytes());
+                            break;
+                        case "-90.0":
+                            os.write("s80".getBytes());
+                            break;
+                        case "-180.0":
+                            os.write("c80".getBytes());
+                            break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                switch (keyEvent.getCode()) {
-                    case W:
-                        innerCircle.setCenterY(90);
-                        break;
-                    case S:
-                        innerCircle.setCenterY(90);
-                        break;
-                    case D:
-                        innerCircle.setCenterX(130);
-                        break;
-                    case A:
-                        innerCircle.setCenterX(130);
-                        break;
+
+                try {
+                    switch (keyEvent.getCode()) {
+                        case W:
+                            innerCircle.setCenterY(300);
+                            os.write("x".getBytes());
+                            break;
+                        case S:
+                            innerCircle.setCenterY(300);
+                            os.write("x".getBytes());
+                            break;
+                        case D:
+                            innerCircle.setCenterX(250);
+                            os.write("x".getBytes());
+                            break;
+                        case A:
+                            innerCircle.setCenterX(250);
+                            os.write("x".getBytes());
+                            break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -178,5 +225,4 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
-    }
+}
