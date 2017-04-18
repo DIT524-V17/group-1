@@ -1,8 +1,36 @@
 * go to pi folder on terminal
 * create a script like as camera.sh
 * nano camera.sh
-* write your script in here, then ctrl x, enter y, enter
-* give the file root permission to file
+* write your script in here, then ctrl o, enter, ctrl x
+* give the file root permission
 * sudo 777 camera.sh
 * run sudo nano .bashrc command on terminal
-* write ./camera.sh on the end of the line, then ctrl x, enter y, enter
+* write ./camera.sh at the end of the line, then ctrl o, enter, enter x
+
+———————————————————————————————————————————————————————————————————————
+
+Installing uv4l for streaming on pi:
+Link: https://www.linux-projects.org/uv4l/
+
+* download package:
+
+wget http://www.linux-projects.org/listing/uv4l_repo/lrkey.asc && sudo apt-key add ./lrkey.asc
+
+* open list:
+
+sudo nano /etc/apt/sources.list
+
+* add the fallowing 
+
+deb http://www.linux-projects.org/listing/uv4l_repo/raspbian/ wheezy main
+
+* and install:
+
+sudo apt-get update
+sudo apt-get install uv4l uv4l-raspicam
+sudo apt-get install uv4l-raspicam-extras
+sudo rpi-update
+sudo apt-get install uv4l-server
+sudo apt-get install uv4l-uvc
+sudo apt-get install uv4l-xscreen
+sudo apt-get install uv4l-mjpegstream
