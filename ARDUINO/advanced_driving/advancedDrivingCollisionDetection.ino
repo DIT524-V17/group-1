@@ -2,10 +2,11 @@
 
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
-const int TRIGGER_PIN1 = 6;         //change it to whatever tor says
-const int ECHO_PIN1 = 5;
-//const int TRIGGER_PIN2;
-//const int ECHO_PIN2;
+//Analogue pins below
+const int TRIGGER_PIN1 = 11;         
+const int ECHO_PIN1 = 12;
+const int TRIGGER_PIN2 = 13;
+const int ECHO_PIN2 = 14;
 
 Car car;
 
@@ -55,7 +56,7 @@ void avarageSpeed() {
 void setup() {
   Serial.begin(9600);
   US1.attach(TRIGGER_PIN1, ECHO_PIN1);
-  //TODO US2.attach(TRIGGER_PIN2, ECHO_PIT2)
+  US2.attach(TRIGGER_PIN2, ECHO_PIN2);
   car.begin();
   odoLeft.attach(TRIGER_ODOL_PIN);
   odoRight.attach(TRIGER_ODOR_PIN);
@@ -66,7 +67,7 @@ void setup() {
 void loop() {
 
   int d1 = US1.getDistance();               //get current distance from frontal US sensor
-  //int d2 = US2.getDistance();
+  int d2 = US2.getDistance();
 
   avarageSpeed();
   
@@ -85,17 +86,19 @@ void loop() {
         colToggle(collisionControl);
         
       case 'w' :                         //move forward
-        lSpeed = extract();
-        rSpeed = extract();
         if(collisionControl && d1 > 10){
+          lSpeed = extract();
+          rSpeed = extract();
           moveFor(lSpeed, rSpeed);
         }
         break;
 
       case 's' :                        //move backward
-        lSpeed = -extract();
-        rSpeed = -extract();
-        moveBack(lSpeed, rSpeed);
+        if(collisionControl && d2 > 10){
+          lSpeed = -extract();
+          rSpeed = -extract();
+          moveBack(lSpeed, rSpeed);
+        }
         break;
 
       case 'a' :                       //turn in-place to the left (more of a drift in place)
@@ -111,31 +114,35 @@ void loop() {
         break;
 
       case 'q' :                     //diagonal forward left turn
-        lSpeed = extract() / 2;
-        rSpeed = extract();
         if(collisionControl && d1 > 10){
+           lSpeed = extract() / 2;
+           rSpeed = extract();
            moveFor(lSpeed, rSpeed);
         }
         break;
 
       case 'e' :                    //diagonal forward right turn
-        lSpeed = extract();
-        rSpeed = extract() / 2;
         if(collisionControl && d1 > 10){
+          lSpeed = extract();
+          rSpeed = extract() / 2;
           moveFor(lSpeed, rSpeed);
         }
         break;
 
       case 'z' :                    //diagonal backward left turn
-        lSpeed = -(extract() / 2);
-        rSpeed = -extract();
-        moveBack(lSpeed, rSpeed);
+       if(collisionControl && d2 > 10){
+          lSpeed = -(extract() / 2);
+          rSpeed = -extract();
+          moveBack(lSpeed, rSpeed);
+        }
         break;
 
       case 'c' :                   //diagonal backward right turn
-        lSpeed = -extract();
-        rSpeed = -(extract() / 2);
-        moveBack(lSpeed, rSpeed);
+        if(collisionControl && d2 > 10){
+          lSpeed = -extract();
+          rSpeed = -(extract() / 2);
+          moveBack(lSpeed, rSpeed);
+        }
         break;
 
       case 'x' :                  //Stop
