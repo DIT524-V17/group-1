@@ -50,6 +50,7 @@ public class Main extends Application {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "An error has occurred, please restart the application and make sure bluetooth is turned on.");
                 }
             }
 
@@ -118,10 +119,10 @@ public class Main extends Application {
 
         outerCircle.setCenterX(250);
         outerCircle.setCenterY(300);
-        outerCircle.setRadius(60);
+        outerCircle.setRadius(120);
         innerCircle.setCenterX(250);
         innerCircle.setCenterY(300);
-        innerCircle.setRadius(20);
+        innerCircle.setRadius(40);
         outerCircle.setFill(Color.GREEN);
         innerCircle.setFill(Color.BLACK);
 
