@@ -3,10 +3,10 @@
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
 //Analogue pins below
-const int TRIGGER_PIN1 = 11;         
-const int ECHO_PIN1 = 12;
-const int TRIGGER_PIN2 = 13;
-const int ECHO_PIN2 = 14;
+const int TRIGGER_PIN1 = A11;
+const int ECHO_PIN1 = A12;
+const int TRIGGER_PIN2 = A13;
+const int ECHO_PIN2 = A14;
 
 Car car;
 
@@ -18,7 +18,8 @@ SR04 US2;                                 //Back US sensor
 int lSpeed;
 int rSpeed;
 String rData;
-bool collisionControl = true;             //toggle variable for collision control true by default 
+bool collisionControl = true;             //toggle variable for collision control true by default
+char dir;
 
 // to split up the string and set 1. and 2. char of it as speed
 int extract() {
@@ -26,7 +27,7 @@ int extract() {
   return carSpeed;
 }
 
-void colToggle(bool collisionCotrol){
+void colToggle(bool collisionCotrol) {
   collisionControl = !collisionControl;
 }
 
@@ -69,8 +70,44 @@ void loop() {
   int d1 = US1.getDistance();               //get current distance from frontal US sensor
   int d2 = US2.getDistance();
 
-  avarageSpeed();
-  
+  boolean frontStop = false;
+  boolean backStop = false;
+
+  char direction = 'n';
+
+  //avarageSpeed();
+  Serial.print(d1);
+  Serial.print(":");
+  Serial.println(d2);
+
+
+  switch (dir) {                            // A switch case that makes sure that the car will stop according to the car's directions
+
+    case 'w':
+
+      if (d1 > 2 && d1 < 30) {
+        eStop(extract(), extract());
+      } else {
+        moveFor(lSpeed, rSpeed);
+      }
+
+      break;
+
+    case 's':
+
+      if (d2 > 2 && d2 < 30) {
+        eStop(extract(), extract());
+      } else {
+        moveBack(lSpeed, rSpeed);
+      }
+
+      break;
+
+
+  }
+
+
+
   if (Serial.available() > 0) {
 
     while (rData.length() < 3) {
@@ -84,75 +121,104 @@ void loop() {
     switch (y) {
       case 't' :                         //turn collision detection on/off
         colToggle(collisionControl);
-        
-      case 'w' :                         //move forward
-        if(collisionControl && d1 > 10){
-          lSpeed = extract();
-          rSpeed = extract();
-          moveFor(lSpeed, rSpeed);
-        }
-        break;
 
-      case 's' :                        //move backward
-        if(collisionControl && d2 > 10){
-          lSpeed = -extract();
-          rSpeed = -extract();
-          moveBack(lSpeed, rSpeed);
-        }
+      case 'w' :                         //move forward
+
+        lSpeed = extract();
+        rSpeed = extract();
+        moveFor(lSpeed, rSpeed);
+
+        dir = 'w';
+
         break;
 
       case 'a' :                       //turn in-place to the left (more of a drift in place)
+
         lSpeed = -extract();
         rSpeed = extract();
         turn(lSpeed, rSpeed);
+
+        dir = 'a';
+
         break;
 
+      case 's' :                        //move backward
+
+        lSpeed = -extract();
+        rSpeed = -extract();
+        moveBack(lSpeed, rSpeed);
+
+        dir = 's';
+
+        break;
+
+
+
       case 'd' :                      //turn in-place to the right (more of a drift in place)
+
         lSpeed = extract();
         rSpeed = -extract();
         turn(lSpeed, rSpeed);
+
+        dir = 'd';
+
         break;
 
       case 'q' :                     //diagonal forward left turn
-        if(collisionControl && d1 > 10){
-           lSpeed = extract() / 2;
-           rSpeed = extract();
-           moveFor(lSpeed, rSpeed);
-        }
+
+        lSpeed = extract() / 2;
+        rSpeed = extract();
+        moveFor(lSpeed, rSpeed);
+
+        dir = 'q';
+
         break;
 
       case 'e' :                    //diagonal forward right turn
-        if(collisionControl && d1 > 10){
-          lSpeed = extract();
-          rSpeed = extract() / 2;
-          moveFor(lSpeed, rSpeed);
-        }
+
+        lSpeed = extract();
+        rSpeed = extract() / 2;
+        moveFor(lSpeed, rSpeed);
+
+        dir = 'e';
+
         break;
 
       case 'z' :                    //diagonal backward left turn
-       if(collisionControl && d2 > 10){
-          lSpeed = -(extract() / 2);
-          rSpeed = -extract();
-          moveBack(lSpeed, rSpeed);
-        }
+
+        lSpeed = -(extract() / 2);
+        rSpeed = -extract();
+        moveBack(lSpeed, rSpeed);
+
+        dir = 'z';
+
         break;
 
       case 'c' :                   //diagonal backward right turn
-        if(collisionControl && d2 > 10){
-          lSpeed = -extract();
-          rSpeed = -(extract() / 2);
-          moveBack(lSpeed, rSpeed);
-        }
+
+        lSpeed = -extract();
+        rSpeed = -(extract() / 2);
+        moveBack(lSpeed, rSpeed);
+
+        dir = 'c';
+
         break;
 
       case 'x' :                  //Stop
         eStop(extract(), extract());
+
+        dir = 'x';
+
         break;
 
       default :
+        direction = 'n';
         Serial.print("The smartCar doesn't move!");
+
         break;
     }
+
     rData = "";
+
   }
 }
