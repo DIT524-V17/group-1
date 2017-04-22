@@ -2,12 +2,13 @@
 
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
+
 //Analogue pins below
 const int TRIGGER_PIN1 = A11;
 const int ECHO_PIN1 = A12;
 const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
-
+#define LED A8
 Car car;
 
 Odometer odoLeft;
@@ -63,6 +64,7 @@ void setup() {
   odoRight.attach(TRIGER_ODOR_PIN);
   odoLeft.begin();
   odoRight.begin();
+  pinMode(LED, OUTPUT);
 }
 
 void loop() {
@@ -86,9 +88,14 @@ void loop() {
     case 'w':
 
       if (d1 > 2 && d1 < 30) {
+        digitalWrite(LED, HIGH);
         eStop(extract(), extract());
+
+
       } else {
+        digitalWrite(LED, LOW);
         moveFor(lSpeed, rSpeed);
+
       }
 
       break;
@@ -96,9 +103,14 @@ void loop() {
     case 's':
 
       if (d2 > 2 && d2 < 30) {
+        digitalWrite(LED, HIGH);
         eStop(extract(), extract());
+
+
       } else {
+        digitalWrite(LED, LOW);
         moveBack(lSpeed, rSpeed);
+
       }
 
       break;
@@ -158,6 +170,8 @@ void loop() {
         rSpeed = -extract();
         turn(lSpeed, rSpeed);
 
+        dir = 'd';
+
         break;
 
       case 'q' :                     //diagonal forward left turn
@@ -165,6 +179,8 @@ void loop() {
         lSpeed = extract() / 2;
         rSpeed = extract();
         moveFor(lSpeed, rSpeed);
+
+        dir = 'q';
 
         break;
 
@@ -174,6 +190,8 @@ void loop() {
         rSpeed = extract() / 2;
         moveFor(lSpeed, rSpeed);
 
+        dir = 'e';
+
         break;
 
       case 'z' :                    //diagonal backward left turn
@@ -181,6 +199,8 @@ void loop() {
         lSpeed = -(extract() / 2);
         rSpeed = -extract();
         moveBack(lSpeed, rSpeed);
+
+        dir = 'z';
 
         break;
 
@@ -190,16 +210,20 @@ void loop() {
         rSpeed = -(extract() / 2);
         moveBack(lSpeed, rSpeed);
 
+        dir = 'c';
+
         break;
 
       case 'x' :                  //Stop
         eStop(extract(), extract());
+        dir = 'x';
 
         break;
 
       default :
         direction = 'n';
         Serial.print("The smartCar doesn't move!");
+
 
         break;
     }
