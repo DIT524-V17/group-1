@@ -138,8 +138,6 @@ void loop() {
         rSpeed = extract();
         turn(lSpeed, rSpeed);
 
-        dir = 'a';
-
         break;
 
       case 's' :                        //move backward
@@ -160,8 +158,6 @@ void loop() {
         rSpeed = -extract();
         turn(lSpeed, rSpeed);
 
-        dir = 'd';
-
         break;
 
       case 'q' :                     //diagonal forward left turn
@@ -169,8 +165,6 @@ void loop() {
         lSpeed = extract() / 2;
         rSpeed = extract();
         moveFor(lSpeed, rSpeed);
-
-        dir = 'q';
 
         break;
 
@@ -180,8 +174,6 @@ void loop() {
         rSpeed = extract() / 2;
         moveFor(lSpeed, rSpeed);
 
-        dir = 'e';
-
         break;
 
       case 'z' :                    //diagonal backward left turn
@@ -189,8 +181,6 @@ void loop() {
         lSpeed = -(extract() / 2);
         rSpeed = -extract();
         moveBack(lSpeed, rSpeed);
-
-        dir = 'z';
 
         break;
 
@@ -200,14 +190,10 @@ void loop() {
         rSpeed = -(extract() / 2);
         moveBack(lSpeed, rSpeed);
 
-        dir = 'c';
-
         break;
 
       case 'x' :                  //Stop
         eStop(extract(), extract());
-
-        dir = 'x';
 
         break;
 
