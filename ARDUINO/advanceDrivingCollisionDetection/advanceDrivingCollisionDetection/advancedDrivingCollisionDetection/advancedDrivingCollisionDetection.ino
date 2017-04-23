@@ -138,7 +138,7 @@ void loop() {
 
         lSpeed = extract();
         rSpeed = extract();
-        moveFor(lSpeed, rSpeed);
+        //moveFor(lSpeed, rSpeed);
 
         dir = 'w';
 
@@ -156,7 +156,7 @@ void loop() {
 
         lSpeed = -extract();
         rSpeed = -extract();
-        moveBack(lSpeed, rSpeed);
+        //moveBack(lSpeed, rSpeed);
 
         dir = 's';
 
