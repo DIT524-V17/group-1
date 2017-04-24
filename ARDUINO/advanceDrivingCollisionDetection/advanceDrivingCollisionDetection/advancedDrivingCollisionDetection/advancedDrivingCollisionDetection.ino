@@ -10,46 +10,56 @@ const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
 #define LED A8
 Car car;
-
 Odometer odoLeft;
 Odometer odoRight;
 SR04 US1;                                 //Front US sensor
 SR04 US2;                                 //Back US sensor
-
 int lSpeed;
 int rSpeed;
 String rData;
-bool collisionControl = true;             //toggle variable for collision control true by default
 char dir;
 
-// to split up the string and set 1. and 2. char of it as speed
+/*
+   A method to split up the string and set 1. and 2. char of it as speed
+*/
 int extract() {
   int carSpeed = rData.substring(1, 3).toInt();
   return carSpeed;
 }
 
-void colToggle(bool collisionCotrol) {
-  collisionControl = !collisionControl;
-}
-
+/*
+   A method for move the car forward
+*/
 void moveFor(int lSpeed, int rSpeed) {
   car.setMotorSpeed(lSpeed, rSpeed);
 }
 
+/*
+   A method to move the car backward
+*/
 void moveBack(int lSpeed, int rSpeed) {
   car.setMotorSpeed(lSpeed, rSpeed);
 }
+
+/*
+   A method to turn the car to left and right
+*/
 void turn(int lSpeed, int rSpeed) {
   car.setMotorSpeed(lSpeed, rSpeed);
 }
+
+/*
+   A method to stop the car.
+*/
 void eStop(int lSpeed, int rSpeed) {
   car.setMotorSpeed(-lSpeed, -rSpeed);
   delay(100);
   car.setMotorSpeed(0, 0);
 }
 
-// to send current speed to controller
-// maybe it needs to be improved
+/*
+   A method to send current speed to controller
+*/
 void avarageSpeed() {
   float avarage = (odoLeft.getSpeed() + odoRight.getSpeed()) / 2;
   Serial.println(avarage);
@@ -69,35 +79,28 @@ void setup() {
 
 void loop() {
 
-  int d1 = US1.getDistance();               //get current distance from frontal US sensor
+  //get current distance from frontal US sensor
+  int d1 = US1.getDistance();
   int d2 = US2.getDistance();
 
-  boolean frontStop = false;
-  boolean backStop = false;
+  Serial.print("The average speed: " + avarageSpeed());
 
-  char direction = 'n';
-
-  //avarageSpeed();
-  Serial.print(d1);
-  Serial.print(":");
-  Serial.println(d2);
-
-
-  switch (dir) {                            // A switch case that makes sure that the car will stop according to the car's directions
+  /*
+     A switch case that makes sure that the car
+     will stop according to the car's directions.
+     Also, it will turn on the red led if there is any obstacle
+  */
+  switch (dir) {
 
     case 'w':
 
       if (d1 > 2 && d1 < 30) {
         digitalWrite(LED, HIGH);
         eStop(extract(), extract());
-
-
       } else {
         digitalWrite(LED, LOW);
         moveFor(lSpeed, rSpeed);
-
       }
-
       break;
 
     case 's':
@@ -105,20 +108,12 @@ void loop() {
       if (d2 > 2 && d2 < 30) {
         digitalWrite(LED, HIGH);
         eStop(extract(), extract());
-
-
       } else {
         digitalWrite(LED, LOW);
         moveBack(lSpeed, rSpeed);
-
       }
-
       break;
-
-
   }
-
-
 
   if (Serial.available() > 0) {
 
@@ -126,109 +121,82 @@ void loop() {
       char m = Serial.read();
       rData += String(m);
     }
-
-
     char y = rData.charAt(0);
 
+    /*
+          A switch case that controls the car movement
+    */
     switch (y) {
-      case 't' :                         //turn collision detection on/off
+
+      case 't' :                                                  //Turn collision detection on/off
         colToggle(collisionControl);
 
-      case 'w' :                         //move forward
+      case 'w' :                                                 //Move forward
 
         lSpeed = extract();
         rSpeed = extract();
-        //moveFor(lSpeed, rSpeed);
-
         dir = 'w';
-
         break;
 
-      case 'a' :                       //turn in-place to the left (more of a drift in place)
+      case 'a' :                                                //Turn in-place to the left (more of a drift in place)
 
         lSpeed = -extract();
         rSpeed = extract();
         turn(lSpeed, rSpeed);
-
         break;
 
-      case 's' :                        //move backward
+      case 's' :                                               //Move backward
 
         lSpeed = -extract();
         rSpeed = -extract();
-        //moveBack(lSpeed, rSpeed);
-
         dir = 's';
-
         break;
 
-
-
-      case 'd' :                      //turn in-place to the right (more of a drift in place)
+      case 'd' :                                              //Turn in-place to the right (more of a drift in place)
 
         lSpeed = extract();
         rSpeed = -extract();
         turn(lSpeed, rSpeed);
-
-        dir = 'd';
-
         break;
 
-      case 'q' :                     //diagonal forward left turn
+      case 'q' :                                             //Diagonal forward left turn
 
         lSpeed = extract() / 2;
         rSpeed = extract();
         moveFor(lSpeed, rSpeed);
-
-        dir = 'q';
-
         break;
 
-      case 'e' :                    //diagonal forward right turn
+      case 'e' :                                            //Diagonal forward right turn
 
         lSpeed = extract();
         rSpeed = extract() / 2;
         moveFor(lSpeed, rSpeed);
-
-        dir = 'e';
-
         break;
 
-      case 'z' :                    //diagonal backward left turn
+      case 'z' :                                           //Diagonal backward left turn
 
         lSpeed = -(extract() / 2);
         rSpeed = -extract();
         moveBack(lSpeed, rSpeed);
-
-        dir = 'z';
-
         break;
 
-      case 'c' :                   //diagonal backward right turn
+      case 'c' :                                          //Diagonal backward right turn
 
         lSpeed = -extract();
         rSpeed = -(extract() / 2);
         moveBack(lSpeed, rSpeed);
-
-        dir = 'c';
-
         break;
 
-      case 'x' :                  //Stop
+      case 'x' :                                        //Stop the car
         eStop(extract(), extract());
         dir = 'x';
-
         break;
 
       default :
-        direction = 'n';
+
         Serial.print("The smartCar doesn't move!");
-
-
         break;
     }
-
     rData = "";
-
   }
 }
