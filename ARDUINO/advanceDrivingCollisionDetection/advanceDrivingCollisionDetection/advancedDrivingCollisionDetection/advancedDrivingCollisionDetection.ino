@@ -83,8 +83,6 @@ void loop() {
   int d1 = US1.getDistance();
   int d2 = US2.getDistance();
 
-  Serial.print("The average speed: " + avarageSpeed());
-
   /*
      A switch case that makes sure that the car
      will stop according to the car's directions.
@@ -121,11 +119,11 @@ void loop() {
       char m = Serial.read();
       rData += String(m);
     }
-    char y = rData.charAt(0);
 
     /*
           A switch case that controls the car movement
     */
+    char y = rData.charAt(0);
     switch (y) {
 
       case 't' :                                                  //Turn collision detection on/off
@@ -199,4 +197,5 @@ void loop() {
     }
     rData = "";
   }
+  Serial.print("The average speed: " + avarageSpeed());
 }
