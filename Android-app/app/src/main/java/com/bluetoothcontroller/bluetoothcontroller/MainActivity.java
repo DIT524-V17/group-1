@@ -1,23 +1,48 @@
+// Package
 package com.bluetoothcontroller.bluetoothcontroller;
 
-import io.github.controlwear.virtual.joystick.android.JoystickView;
+// Joystickview
+// source: https://github.com/controlwear/virtual-joystick-android
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
+
+import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.MediaPlayer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.UUID;
+
+import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 
 public class MainActivity extends AppCompatActivity {
+    private String vidUrl;
+
 
     // bluetooth connection
     private BluetoothAdapter btAdapter = null;
@@ -33,21 +58,33 @@ public class MainActivity extends AppCompatActivity {
     // Display angle and power
     private TextView angleText = null;
     private TextView powerText = null;
+    private TextView speedText = null;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            WebView.enableSlowWholeDocumentDraw();
+        }
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
 
         // joystick to control movement
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
+
+        // All text views
         final TextView angleText = (TextView) findViewById(R.id.angleText);
         final TextView powerText = (TextView) findViewById(R.id.powerText);
+        final TextView speedText = (TextView) findViewById(R.id.speedText);
 
         // bluetooth connection
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        // check if Bluetooth adapter exists
         if (btAdapter == null) {
             // device does not support bluetooth
             Context context = getApplicationContext();
@@ -70,74 +107,87 @@ public class MainActivity extends AppCompatActivity {
          * Movement will be done using a Joystick
          *
          */
-
         // get the movement
         joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
             @Override
             public void onMove(int angle, int strength) {
                 String powerString = "Power: " + strength;
-                String sendPower = "" + strength;
+
+
+
                 // Make sure strength is not 0
                 if (strength > 15) {
+                    String speedData = readSpeed();
                     powerText.setText(powerString);
                     // forward
                     if (angle <= 120 && angle > 60) {
-                        angleText.setText("↑");
-                        sendData("w");
+                        angleText.setText("â†‘");
+                        
+                        sendData("w" + String.valueOf(strength));
+                        //sendSpeed(strength);
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
 
                     // diag forward right
                     if (angle <= 60 && angle > 30) {
-                        angleText.setText("↗");
-                        sendData("e");
+                        angleText.setText("â†—");
+                        sendData("e" +  String.valueOf(strength));
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
 
                     }
 
                     // right
                     if (angle <= 30 || angle > 330) {
-                        angleText.setText("→");
-                        sendData("d");
+                        angleText.setText("â†’");
+                        sendData("d" + String.valueOf(strength));
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
 
                     // diag backward right
                     if (angle <= 330 && angle > 300) {
-                        angleText.setText("↘");
-                        sendData("c");
+                        angleText.setText("â†˜");
+                        sendData("c" + String.valueOf(strength));
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
 
                     // backward
                     if (angle <= 300 && angle > 240) {
-                        angleText.setText("↓");
-                        sendData("s");
+                        angleText.setText("â†“");
+                        sendData("s" + String.valueOf(strength));
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
 
                     // diag backward left
                     if (angle <= 240 && angle > 210) {
-                        angleText.setText("↙");
-                        sendData("z");
+                        angleText.setText("â†™");
+                        sendData("z" + String.valueOf(strength));
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
 
                     // left
                     if (angle <= 210 && angle > 150) {
-                        angleText.setText("←");
-                        sendData("a");
+                        angleText.setText("â†�");
+                        sendData("a" + String.valueOf(strength));
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
 
                     // diag forward left
                     if (angle <= 150 && angle > 120) {
-                        angleText.setText("↖");
-                        sendData("q");
+                        angleText.setText("â†–");
+                        sendData("q" + String.valueOf(strength));
+                        speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
-                } else {
-                    // send "stop" signal
+                }
+                else {
+                    // stop when nothing is held down
                     sendData("x");
                 }
 
@@ -163,14 +213,23 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e2) {
             errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
         }
+
     }
 
     @Override
     public void onResume() {
+        // resume app
+        BluetoothDevice device = null;
         super.onResume();
-        BluetoothDevice device = btAdapter.getRemoteDevice(MACaddress);
+        try {
+            device = btAdapter.getRemoteDevice(MACaddress);
+        } catch (NullPointerException npe) {
+            // never initiated, try running on physical phone
+        }
 
 
+
+        // create bluetooth socket
         try {
             btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
 
@@ -203,6 +262,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    // Exit the app with an error message
     private void errorExit(String title, String message) {
         Toast msg = Toast.makeText(getBaseContext(), title + " : " + message, Toast.LENGTH_LONG);
         msg.show();
@@ -211,10 +272,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     // To be used to send how fast the speed should be
-    private void sendSpeed(String send) {
+    private void sendSpeed(int send) {
         if (btSocket != null) {
             try {
-                btSocket.getOutputStream().write(send.getBytes());
+                btSocket.getOutputStream().write(send);
                 btSocket.getOutputStream().flush();
             }
             catch (IOException e) {
@@ -223,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     // send the character for what direction to drive
+    // will have to be combined with sendspeed, since its serial communications
     private void sendData(String send) {
         if (btSocket != null) {
             try {
@@ -236,6 +298,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // read speed data, from cars odometers
+    private String readSpeed()  {
+        String s = "";
+        try {
+            InputStream in = btSocket.getInputStream();
+            float f = in.read();
+
+            s = Float.toString(f);
+        }
+        catch (IOException e) {
+
+        }
+        return s;
+    }
 
 
 }
