@@ -1,4 +1,6 @@
 #include <Smartcar.h>
+#include <SPI.h> 
+#include <SD.h> 
 
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
@@ -8,6 +10,9 @@ const int TRIGGER_PIN1 = A11;
 const int ECHO_PIN1 = A12;
 const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
+
+const int SDpin = 53; // this is the CS pin on the SD card breakout, change it if you choose a different pin.
+
 #define LED A8
 Car car;
 Odometer odoLeft;
@@ -18,6 +23,7 @@ int lSpeed;
 int rSpeed;
 String rData;
 char dir;
+
 
 /*
    A method to split up the string and set 1. and 2. char of it as speed
@@ -62,11 +68,46 @@ void eStop(int lSpeed, int rSpeed) {
 */
 void avarageSpeed() {
   float avarage = (odoLeft.getSpeed() + odoRight.getSpeed()) / 2;
-  Serial.println(avarage);
+  Serial2.println(avarage);
 }
 
+void initialiseSD(int pin) {
+  //use this function whenever you want to verify that the SD card is working properly
+  Serial2.print("Initializing SD card..."); 
+    // see if the card is present and can be initialized: 
+    if (!SD.begin(pin)) { Serial2.println("Card failed, or not present"); 
+    // don't do anything more: 
+    return; 
+    } 
+    Serial2.println("card initialized."); 
+}
+
+void writeSD(String command, int speed) {
+  //use this command when you want to write to the textfile.
+  
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dataFile) {
+    speed = extract();
+    dataFile.println(command + speed);
+    Serial2.println(command + speed);
+    
+    
+    
+    dataFile.close();
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial2.println("error opening datalog.txt");
+    } 
+}
+
+
 void setup() {
-  Serial.begin(9600);
+  Serial2.begin(9600);
   US1.attach(TRIGGER_PIN1, ECHO_PIN1);
   US2.attach(TRIGGER_PIN2, ECHO_PIN2);
   car.begin();
@@ -75,6 +116,8 @@ void setup() {
   odoLeft.begin();
   odoRight.begin();
   pinMode(LED, OUTPUT);
+  initialiseSD(SDpin);
+  
 }
 
 void loop() {
@@ -83,7 +126,6 @@ void loop() {
   int d1 = US1.getDistance();
   int d2 = US2.getDistance();
 
-  Serial.print("The average speed: " + avarageSpeed());
 
   /*
      A switch case that makes sure that the car
@@ -115,10 +157,10 @@ void loop() {
       break;
   }
 
-  if (Serial.available() > 0) {
+  if (Serial2.available() > 0) {
 
     while (rData.length() < 3) {
-      char m = Serial.read();
+      char m = Serial2.read();
       rData += String(m);
     }
 
@@ -133,6 +175,7 @@ void loop() {
         lSpeed = extract();
         rSpeed = extract();
         dir = 'w';
+        writeSD("s", extract());
         break;
 
       case 'a' :                                                //Turn in-place to the left (more of a drift in place)
@@ -140,6 +183,7 @@ void loop() {
         lSpeed = -extract();
         rSpeed = extract();
         turn(lSpeed, rSpeed);
+        writeSD("d", extract());
         break;
 
       case 's' :                                               //Move backward
@@ -147,6 +191,7 @@ void loop() {
         lSpeed = -extract();
         rSpeed = -extract();
         dir = 's';
+        writeSD("w", extract());
         break;
 
       case 'd' :                                              //Turn in-place to the right (more of a drift in place)
@@ -154,6 +199,7 @@ void loop() {
         lSpeed = extract();
         rSpeed = -extract();
         turn(lSpeed, rSpeed);
+        writeSD("a", extract());
         break;
 
       case 'q' :                                             //Diagonal forward left turn
@@ -161,6 +207,7 @@ void loop() {
         lSpeed = extract() / 2;
         rSpeed = extract();
         moveFor(lSpeed, rSpeed);
+        writeSD("c", extract());
         break;
 
       case 'e' :                                            //Diagonal forward right turn
@@ -168,6 +215,7 @@ void loop() {
         lSpeed = extract();
         rSpeed = extract() / 2;
         moveFor(lSpeed, rSpeed);
+        writeSD("z", extract());
         break;
 
       case 'z' :                                           //Diagonal backward left turn
@@ -175,6 +223,7 @@ void loop() {
         lSpeed = -(extract() / 2);
         rSpeed = -extract();
         moveBack(lSpeed, rSpeed);
+        writeSD("e", extract());
         break;
 
       case 'c' :                                          //Diagonal backward right turn
@@ -182,16 +231,18 @@ void loop() {
         lSpeed = -extract();
         rSpeed = -(extract() / 2);
         moveBack(lSpeed, rSpeed);
+        writeSD("q", extract());
         break;
 
       case 'x' :                                        //Stop the car
         eStop(extract(), extract());
         dir = 'x';
+        writeSD("x", extract());
         break;
 
       default :
 
-        Serial.print("The smartCar doesn't move!");
+        Serial2.print("The smartCar doesn't move!");
         break;
     }
     rData = "";
