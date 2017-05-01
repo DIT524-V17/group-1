@@ -7,4 +7,4 @@ The Marvelous Amazing Car!
 
 Current circuit diagram of our car
 
-![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/Circuit%20Diagram%20for%20SmartCar.png)
+![alt text]( https://github.com/DIT524-V17/group-1/blob/master/Circuit_Diagram/Circuit_Diagram_for_SmartCar.png)
