@@ -59,16 +59,41 @@ void avarageSpeed() {
   float avarage = (odoLeft.getSpeed() + odoRight.getSpeed()) / 2;
   Serial.println(avarage);
 }
+
+/*
+    Method to read an entire txt file and print it on the monitor
+ */
+
+void printTXT() {
+  File myFile = SD.open("datalog.txt");
+  if (myFile) {
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+      Serial.write(myFile.read());
+    }
+    // close the file:
+    myFile.close();
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+}
+ 
+
 void initialiseSD(int pin) {
   //use this function whenever you want to verify that the SD card is working properly
   Serial.print("Initializing SD card..."); 
     // see if the card is present and can be initialized: 
-    if (!SD.begin(pin)) { Serial.println("Card failed, or not present"); 
+
+    if (!SD.begin(pin)) { 
+      Serial2.println("Card failed, or not present");
     // don't do anything more: 
     return; 
     } 
-    Serial.println("card initialized."); 
+    Serial2.println("card initialized.");
+    
 }
+
 void writeSD(String command, int speed) {
   //use this command when you want to write to the textfile.
   
@@ -90,8 +115,26 @@ void writeSD(String command, int speed) {
     Serial.println("error opening datalog.txt");
     } 
 }
+
+void startRetracing() {
+  File myFile = SD.open("datalog.txt");
+  if (myFile) {
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+      Serial.write(myFile.read());
+    }
+    // close the file:
+    myFile.close();
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+}
+
+
 void setup() {
   Serial.begin(9600);
+  Serial2.begin(9600);
   US1.attach(TRIGGER_PIN1, ECHO_PIN1);
   US2.attach(TRIGGER_PIN2, ECHO_PIN2);
   car.begin();
@@ -100,6 +143,12 @@ void setup() {
   odoLeft.begin();
   odoRight.begin();
   pinMode(LED, OUTPUT);
+
+  //add handshake function here 
+  // waitForApp() for (x == 1) { check if bluetooth is paired properly, 
+  // eg : Serial2.print("Hello");
+  //  delay(200);      
+  //if (Serial2.available() > 0 ) { break; }
   initialiseSD(SDpin);
   
 }
@@ -132,9 +181,13 @@ void loop() {
       }
       break;
   }
+
+
   if (Serial.available() > 0) {
+
     while (rData.length() < 3) {
-      char m = Serial.read();
+      char m = Serial.read(); //add clause for using both serials for debugging
+
       rData += String(m);
     }
     /*
@@ -195,6 +248,12 @@ void loop() {
         dir = 'x';
         writeSD("x", extract());
         break;
+      case 'h' :
+        printTXT();
+        break;
+      case 'j' :
+        break;
+
       default :
         Serial.print("The smartCar doesn't move!");
         break;
