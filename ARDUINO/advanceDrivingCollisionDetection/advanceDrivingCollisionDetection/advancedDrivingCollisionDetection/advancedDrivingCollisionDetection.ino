@@ -1,8 +1,6 @@
 #include <Smartcar.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SPI.h>
-#include <SD.h>
+#include <SPI.h> 
+#include <SD.h> 
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
 //Analogue pins below
@@ -10,12 +8,8 @@ const int TRIGGER_PIN1 = A11;
 const int ECHO_PIN1 = A12;
 const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
-const int SDpin = 53;                      // this is the CS pin on the SD card breakout, change it if you choose a different pin.
-#define LED1 A9                            // Obstacle detection LED (RED)
-#define LED2 A10                           // Forward LED (BLUE)
-#define LED3 A8                            // Backward LED (RED)
-#define LED4 A7                            // Turn right LED (GREEN)
-#define LED5 A5                            // Turn left LED (GREEN)
+const int SDpin = 53; // this is the CS pin on the SD card breakout, change it if you choose a different pin.
+#define LED A8 
 Car car;
 Odometer odoLeft;
 Odometer odoRight;
@@ -32,7 +26,6 @@ int extract() {
   int carSpeed = rData.substring(1, 3).toInt();
   return carSpeed;
 }
-
 /*
    A method that moves the car forward
 */
@@ -69,18 +62,16 @@ void avarageSpeed() {
 
 /*
     Method to read an entire txt file and print it on the monitor
-  -*/
-+ * /
+ */
 
 void printTXT() {
-
   File myFile = SD.open("datalog1.txt");
   if (myFile) {
     // read from the file until there's nothing else in it:
     while (myFile.available()) {
-      +
+      
       Serial.write(myFile.read());
-      +
+    
     }
     // close the file:
     myFile.close();
@@ -89,48 +80,42 @@ void printTXT() {
     Serial.println("error opening test.txt");
   }
 }
-
+ 
 
 void initialiseSD(int pin) {
   //use this function whenever you want to verify that the SD card is working properly
+  Serial.print("Initializing SD card..."); 
+    // see if the card is present and can be initialized: 
 
-  Serial.print("Initializing SD card...");
-  // see if the card is present and can be initialized:
-
-  if (!SD.begin(pin)) {
-    Serial2.println("Card failed, or not present");
-    // don't do anything more:
-    return;
-
-  }
-  Serial2.println("card initialized.");
-
+    if (!SD.begin(pin)) { 
+      Serial2.println("Card failed, or not present");
+    // don't do anything more: 
+    return; 
+    } 
+    Serial2.println("card initialized.");
+    
 }
-
 
 void writeSD(String command) {
   //use this command when you want to write to the textfile.
-
-
+  
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open("datalog1.txt", FILE_WRITE);
   // if the file is available, write to it:
   if (dataFile) {
 
-
     dataFile.println(command);
     Serial.println(command);
-
+    
+    
+    
     dataFile.close();
   }
   // if the file isn't open, pop up an error:
   else {
     Serial.println("error opening datalog.txt");
-
-  }
-
-}
+    } 
 }
 
 void startRetracing() {
@@ -160,22 +145,15 @@ void setup() {
   odoRight.attach(TRIGER_ODOR_PIN);
   odoLeft.begin();
   odoRight.begin();
-  pinMode(LED1, OUTPUT);
-  pinMode(LED2, OUTPUT);
-  pinMode(LED3, OUTPUT);
-  pinMode(LED4, OUTPUT);
-  pinMode(LED5, OUTPUT);
+  pinMode(LED, OUTPUT);
 
-
-
-  //add handshake function here
-  // waitForApp() for (x == 1) { check if bluetooth is paired properly,
+  //add handshake function here 
+  // waitForApp() for (x == 1) { check if bluetooth is paired properly, 
   // eg : Serial2.print("Hello");
-
-  //  delay(200);
+  //  delay(200);      
   //if (Serial2.available() > 0 ) { break; }
   initialiseSD(SDpin);
-
+  
 }
 void loop() {
   //get current distance from frontal US sensor
@@ -188,66 +166,33 @@ void loop() {
   */
   switch (dir) {
     case 'w':
-      // digitalWrite(LED2, HIGH);
-      if (d1 > 15 && d1 < 40) {
-
-        digitalWrite(LED1, HIGH);
-        delay(500);
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-
-      }
       if (d1 > 2 && d1 < 30) {
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-
+        digitalWrite(LED, HIGH);
         eStop(extract(), extract());
       } else {
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-
+        digitalWrite(LED, LOW);
         moveFor(lSpeed, rSpeed);
       }
       break;
     case 's':
-      //digitalWrite(LED3, HIGH);
-      if (d2 > 15 && d2 < 40) {
-
-        digitalWrite(LED1, HIGH);
-        delay(500);
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-      }
       if (d2 > 2 && d2 < 30) {
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
+        digitalWrite(LED, HIGH);
         eStop(extract(), extract());
       } else {
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
+        digitalWrite(LED, LOW);
         moveBack(lSpeed, rSpeed);
       }
       break;
   }
 
+if (Serial2.available() > 0) {
+
+    while (rData.length() < 3) {
+      char m = Serial2.read(); //add clause for using both serials for debugging
+
+      rData += String(m);
+    }
+}
 
   if (Serial.available() > 0) {
 
@@ -256,6 +201,7 @@ void loop() {
 
       rData += String(m);
     }
+  }
     /*
           A switch case that controls the car movement
     */
@@ -272,12 +218,6 @@ void loop() {
         rSpeed = extract();
         turn(lSpeed, rSpeed);
         writeSD("d");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, HIGH);
-
         break;
       case 's' :                                               //Move backward
         lSpeed = -extract();
@@ -290,71 +230,35 @@ void loop() {
         rSpeed = -extract();
         turn(lSpeed, rSpeed);
         writeSD("a");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, LOW);
-
         break;
       case 'q' :                                             //Diagonal forward left turn
         lSpeed = extract() / 2;
         rSpeed = extract();
         moveFor(lSpeed, rSpeed);
         writeSD("c");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED5, HIGH);
-        digitalWrite(LED4, LOW);
-
         break;
       case 'e' :                                            //Diagonal forward right turn
         lSpeed = extract();
         rSpeed = extract() / 2;
         moveFor(lSpeed, rSpeed);
         writeSD("z");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, LOW);
-
         break;
       case 'z' :                                           //Diagonal backward left turn
         lSpeed = -(extract() / 2);
         rSpeed = -extract();
         moveBack(lSpeed, rSpeed);
         writeSD("e");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, HIGH);
-
-
         break;
       case 'c' :                                          //Diagonal backward right turn
         lSpeed = -extract();
         rSpeed = -(extract() / 2);
         moveBack(lSpeed, rSpeed);
         writeSD("q");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, LOW);
-
         break;
       case 'x' :                                        //Stop the car
         eStop(extract(), extract());
+        dir = 'x';
         writeSD("x");
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, HIGH);
-
         break;
       case 'h' :
         printTXT();
@@ -363,10 +267,8 @@ void loop() {
         break;
 
       default :
-        Serial.print("The smartCar doesn't move!");
         break;
     }
     rData = "";
-  }
-  yield(); // A function that Passes control to other tasks when called
+  
 }
