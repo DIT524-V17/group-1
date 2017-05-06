@@ -1,8 +1,6 @@
 #include <Smartcar.h>
 #include <SPI.h>
 #include <SD.h>
-#include <SPI.h>
-#include <SD.h>
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
 //Analogue pins below
@@ -69,8 +67,7 @@ void avarageSpeed() {
 
 /*
     Method to read an entire txt file and print it on the monitor
-  -*/
-+ * /
+*/
 
 void printTXT() {
 
@@ -78,9 +75,9 @@ void printTXT() {
   if (myFile) {
     // read from the file until there's nothing else in it:
     while (myFile.available()) {
-      +
+
       Serial.write(myFile.read());
-      +
+
     }
     // close the file:
     myFile.close();
@@ -107,7 +104,6 @@ void initialiseSD(int pin) {
 
 }
 
-
 void writeSD(String command) {
   //use this command when you want to write to the textfile.
 
@@ -131,7 +127,7 @@ void writeSD(String command) {
   }
 
 }
-}
+
 
 void startRetracing() {
   File myFile = SD.open("datalog.txt");
@@ -265,117 +261,121 @@ void loop() {
 
       rData += String(m);
     }
-    /*
-          A switch case that controls the car movement
-    */
-    char y = rData.charAt(0);
-    switch (y) {
-      case 'w' :                                                 //Move forward
-        lSpeed = extract();
-        rSpeed = extract();
-        dir = 'w';
-        writeSD("s");
-        break;
-      case 'a' :                                                //Turn in-place to the left (more of a drift in place)
-        lSpeed = -extract();
-        rSpeed = extract();
-        turn(lSpeed, rSpeed);
-        writeSD("d");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, HIGH);
-
-        break;
-      case 's' :                                               //Move backward
-        lSpeed = -extract();
-        rSpeed = -extract();
-        dir = 's';
-        writeSD("w");
-        break;
-      case 'd' :                                              //Turn in-place to the right (more of a drift in place)
-        lSpeed = extract();
-        rSpeed = -extract();
-        turn(lSpeed, rSpeed);
-        writeSD("a");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, LOW);
-
-        break;
-      case 'q' :                                             //Diagonal forward left turn
-        lSpeed = extract() / 2;
-        rSpeed = extract();
-        moveFor(lSpeed, rSpeed);
-        writeSD("c");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED5, HIGH);
-        digitalWrite(LED4, LOW);
-
-        break;
-      case 'e' :                                            //Diagonal forward right turn
-        lSpeed = extract();
-        rSpeed = extract() / 2;
-        moveFor(lSpeed, rSpeed);
-        writeSD("z");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, LOW);
-
-        break;
-      case 'z' :                                           //Diagonal backward left turn
-        lSpeed = -(extract() / 2);
-        rSpeed = -extract();
-        moveBack(lSpeed, rSpeed);
-        writeSD("e");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, HIGH);
-
-
-        break;
-      case 'c' :                                          //Diagonal backward right turn
-        lSpeed = -extract();
-        rSpeed = -(extract() / 2);
-        moveBack(lSpeed, rSpeed);
-        writeSD("q");
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, LOW);
-
-        break;
-      case 'x' :                                        //Stop the car
-        eStop(extract(), extract());
-        writeSD("x");
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, HIGH);
-        digitalWrite(LED5, HIGH);
-
-        break;
-      case 'h' :
-        printTXT();
-        break;
-      case 'j' :
-        break;
-
-      default :
-        Serial.print("The smartCar doesn't move!");
-        break;
-    }
-    rData = "";
   }
+  /*
+        A switch case that controls the car movement
+  */
+  char y = rData.charAt(0);
+  switch (y) {
+    case 'w' :                                                 //Move forward
+      lSpeed = extract();
+      rSpeed = extract();
+      dir = 'w';
+      writeSD("s");
+      break;
+
+    case 'a' :                                                //Turn in-place to the left (more of a drift in place)
+      lSpeed = -extract();
+      rSpeed = extract();
+      turn(lSpeed, rSpeed);
+      writeSD("d");
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
+      break;
+
+    case 's' :                                               //Move backward
+      lSpeed = -extract();
+      rSpeed = -extract();
+      dir = 's';
+      writeSD("w");
+      break;
+
+    case 'd' :                                              //Turn in-place to the right (more of a drift in place)
+      lSpeed = extract();
+      rSpeed = -extract();
+      turn(lSpeed, rSpeed);
+      writeSD("a");
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
+      break;
+
+    case 'q' :                                             //Diagonal forward left turn
+      lSpeed = extract() / 2;
+      rSpeed = extract();
+      moveFor(lSpeed, rSpeed);
+      writeSD("c");
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED5, HIGH);
+      digitalWrite(LED4, LOW);
+      break;
+
+    case 'e' :                                            //Diagonal forward right turn
+      lSpeed = extract();
+      rSpeed = extract() / 2;
+      moveFor(lSpeed, rSpeed);
+      writeSD("z");
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
+      break;
+
+    case 'z' :                                           //Diagonal backward left turn
+      lSpeed = -(extract() / 2);
+      rSpeed = -extract();
+      moveBack(lSpeed, rSpeed);
+      writeSD("e");
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
+      break;
+
+    case 'c' :                                          //Diagonal backward right turn
+      lSpeed = -extract();
+      rSpeed = -(extract() / 2);
+      moveBack(lSpeed, rSpeed);
+      writeSD("q");
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
+      break;
+
+    case 'x' :                                        //Stop the car
+      eStop(extract(), extract());
+      writeSD("x");
+      digitalWrite(LED1, HIGH);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, HIGH);
+      break;
+
+    case 'h' :
+      printTXT();
+      break;
+
+    case 'j' :
+      break;
+
+    default :
+      Serial.print("The smartCar doesn't move!");
+      break;
+  }
+  rData = "";
   yield(); // A function that Passes control to other tasks when called
 }
+
+
