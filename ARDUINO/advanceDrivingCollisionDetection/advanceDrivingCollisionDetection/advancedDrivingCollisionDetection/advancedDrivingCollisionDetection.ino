@@ -113,7 +113,7 @@ void loop() {
         A switch case that controls the car movement
   */
   char y = rData.charAt(0);
-  
+
   switch (y) {
     case 'w' :                                                 //Move forward
       lSpeed = extract();
@@ -131,14 +131,14 @@ void loop() {
       } else {
         moveFor(lSpeed, rSpeed);
 
-        //ODS        
+        //ODS
         digitalWrite(LED1, LOW);
         digitalWrite(LED2, HIGH);
         digitalWrite(LED3, LOW);
         digitalWrite(LED4, LOW);
         digitalWrite(LED5, LOW);
       }
-      
+
       break;
 
     case 'a' :                                                //Turn in-place to the left (more of a drift in place)
@@ -146,13 +146,13 @@ void loop() {
       rSpeed = extract();
       turn(lSpeed, rSpeed);
 
-      //ODS      
+      //ODS
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
       digitalWrite(LED4, LOW);
       digitalWrite(LED5, HIGH);
-      
+
       break;
 
     case 's' :                                               //Move backward
@@ -168,7 +168,7 @@ void loop() {
         digitalWrite(LED3, LOW);
         digitalWrite(LED4, LOW);
         digitalWrite(LED5, LOW);
-        
+
       } else {
         moveBack(lSpeed, rSpeed);
 
@@ -178,7 +178,7 @@ void loop() {
         digitalWrite(LED3, HIGH);
         digitalWrite(LED4, LOW);
         digitalWrite(LED5, LOW);
-        
+
       }
       break;
 
@@ -189,13 +189,13 @@ void loop() {
       rSpeed = -extract();
       turn(lSpeed, rSpeed);
 
-      //ODS      
+      //ODS
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
       digitalWrite(LED4, HIGH);
       digitalWrite(LED5, LOW);
-      
+
       break;
 
     case 'q' :                                             //Diagonal forward left turn
@@ -209,7 +209,7 @@ void loop() {
       digitalWrite(LED2, HIGH);
       digitalWrite(LED5, HIGH);
       digitalWrite(LED4, LOW);
-      
+
       break;
 
     case 'e' :                                            //Diagonal forward right turn
@@ -223,7 +223,7 @@ void loop() {
       digitalWrite(LED3, LOW);
       digitalWrite(LED4, HIGH);
       digitalWrite(LED5, LOW);
-      
+
       break;
 
     case 'z' :                                           //Diagonal backward left turn
@@ -237,7 +237,7 @@ void loop() {
       digitalWrite(LED3, HIGH);
       digitalWrite(LED4, LOW);
       digitalWrite(LED5, HIGH);
-      
+
       break;
 
     case 'c' :                                          //Diagonal backward right turn
@@ -251,19 +251,12 @@ void loop() {
       digitalWrite(LED3, HIGH);
       digitalWrite(LED4, HIGH);
       digitalWrite(LED5, LOW);
-      
+
       break;
 
     case 'x' :                                        //Stop the car
       eStop(extract(), extract());
 
-      //ODS
-      digitalWrite(LED1, HIGH);
-      digitalWrite(LED2, HIGH);
-      digitalWrite(LED3, HIGH);
-      digitalWrite(LED4, HIGH);
-      digitalWrite(LED5, HIGH);
-      
       break;
   }
 }
