@@ -11,7 +11,7 @@ const int ECHO_PIN1 = A12;
 const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
 const int SDpin = 53;                      // this is the CS pin on the SD card breakout, change it if you choose a different pin.
-#define LED A8
+#define LED A8                             // Obstacle detection LED (RED)
 Car car;
 
 Odometer odoLeft;
@@ -26,14 +26,16 @@ bool collisionControl = true;             //toggle variable for collision contro
 char dir;
 int totalDistance = 0;
 
-// to split up the string and set 1. and 2. char of it as speed
+/*
+   A method that splits up the string and set 1. and 2. char of it as speed
+*/
 int extract() {
   int carSpeed = rData.substring(1, 3).toInt();
   return carSpeed;
 }
 
 int distanceTraveled() {
-  int carDistance = (odoRight.getDistance() + odoLeft.getDistance()) /2;
+  int carDistance = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
   return carDistance;
 }
 
@@ -41,34 +43,48 @@ void colToggle(bool collisionCotrol) {
   collisionControl = !collisionControl;
 }
 
+/*
+   A method that moves the car forward
+*/
 void moveFor(int lSpeed, int rSpeed) {
   car.setMotorSpeed(lSpeed, rSpeed);
 }
 
+/*
+   A method that moves the car backward
+*/
 void moveBack(int lSpeed, int rSpeed) {
   car.setMotorSpeed(lSpeed, rSpeed);
 }
+
+/*
+   A method that turns the car to left and right
+*/
 void turn(int lSpeed, int rSpeed) {
   car.setMotorSpeed(lSpeed, rSpeed);
 }
+
+/*
+   A method that stops the car.
+*/
 void eStop(int lSpeed, int rSpeed) {
   car.setMotorSpeed(-lSpeed, -rSpeed);
   delay(100);
   car.setMotorSpeed(0, 0);
 }
 
-// to send current speed to controller
-// maybe it needs to be improved
+/*
+   A method that sends current speed to controller
+*/
 void avarageSpeed() {
   float avarage = (odoLeft.getSpeed() + odoRight.getSpeed()) / 2;
   Serial.println(avarage);
 }
 
-
+/*
+    Method to read an entire txt file and print it on the monitor
+*/
 void printTXT() {
-
-
-
   File myFile = SD.open("datalog.txt");
 
   if (myFile) {
@@ -77,12 +93,7 @@ void printTXT() {
 
     while (myFile.available()) {
 
-
-
       Serial.write(myFile.read());
-
-
-
     }
 
     // close the file:
@@ -107,13 +118,9 @@ void initialiseSD(int pin) {
 
   //use this function whenever you want to verify that the SD card is working properly
 
-
-
   Serial.print("Initializing SD card...");
 
   // see if the card is present and can be initialized:
-
-
 
   if (!SD.begin(pin)) {
 
@@ -122,15 +129,9 @@ void initialiseSD(int pin) {
     // don't do anything more:
 
     return;
-
-
-
   }
 
   Serial.println("card initialized.");
-
-
-
 }
 
 
@@ -138,10 +139,6 @@ void initialiseSD(int pin) {
 void writeSD(String command, int distanceTraveled) {
 
   //use this command when you want to write to the textfile.
-
-
-
-
 
   // open the file. note that only one file can be open at a time,
 
@@ -153,36 +150,20 @@ void writeSD(String command, int distanceTraveled) {
 
   if (dataFile) {
 
-
-      
-
-    distanceTraveled = (odoRight.getDistance() + odoLeft.getDistance()) /2;
+    distanceTraveled = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
     dataFile.println(command + distanceTraveled);
 
     Serial.println(command + distanceTraveled);
 
-
-
     dataFile.close();
-
   }
 
   // if the file isn't open, pop up an error:
-
   else {
 
     Serial.println("error opening datalog.txt");
-
-
-
   }
-
-
-
 }
-
-
-
 
 
 //void startRetracing() {
@@ -249,7 +230,7 @@ void loop() {
       char m = Serial2.read(); //add clause for using both serials for debugging
 
       rData += String(m);
-     
+
     }
   }
 
@@ -260,7 +241,7 @@ void loop() {
 
       if ( m == 'x') {
         rData = String(m) + "00";
-        
+
       }
       else {
         rData = String(m) + "50";
@@ -268,8 +249,12 @@ void loop() {
     }
   }
 
-  switch (dir) {                            // A switch case that makes sure that the car will stop according to the car's directions
-
+  /*
+      A switch case that makes sure that the car
+      will stop according to the car's directions.
+      Also, it will turn on the red led if there is any obstacle
+  */
+  switch (dir) {
     case 'w':
 
       if (d1 > 2 && d1 < 30) {
@@ -300,6 +285,10 @@ void loop() {
       break;
   }
 
+  /*
+       A switch case that controls the car movement
+  */
+
   char y = rData.charAt(0);
 
   switch (y) {
@@ -311,11 +300,11 @@ void loop() {
       lSpeed = extract();
       rSpeed = extract();
       moveFor(lSpeed, rSpeed);
-      
+
       dir = 'w';
-      
- //     Serial.print();
-      writeSD("s", distanceTraveled-totalDistance);
+
+      //     Serial.print();
+      writeSD("s", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
       break;
 
@@ -324,8 +313,8 @@ void loop() {
       lSpeed = -extract();
       rSpeed = extract();
       turn(lSpeed, rSpeed);
-      writeSD("d", distanceTraveled);// ? take care of rotations 
-  
+      writeSD("d", distanceTraveled);// ? take care of rotations
+
       break;
 
     case 's' :                        //move backward
@@ -335,7 +324,7 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 's';
-      writeSD("w", distanceTraveled-totalDistance);
+      writeSD("w", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
       break;
 
@@ -344,7 +333,7 @@ void loop() {
       lSpeed = extract();
       rSpeed = -extract();
       turn(lSpeed, rSpeed);
-      
+
       dir = 'd';
       writeSD("a", distanceTraveled);
       break;
@@ -356,9 +345,9 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'q';
-      writeSD("c", distanceTraveled-totalDistance);
+      writeSD("c", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
-      
+
       break;
 
     case 'e' :                    //diagonal forward right turn
@@ -368,9 +357,9 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'e';
-      writeSD("z", distanceTraveled-totalDistance);
+      writeSD("z", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
-      
+
       break;
 
     case 'z' :                    //diagonal backward left turn
@@ -380,7 +369,7 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 'z';
-      writeSD("e", distanceTraveled-totalDistance);
+      writeSD("e", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
 
       break;
@@ -392,26 +381,26 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 'c';
-      writeSD("q", distanceTraveled-totalDistance);
+      writeSD("q", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
 
       break;
 
     case 'x' :                  //Stop
       eStop(extract(), extract());
-      
+
       dir = 'x';
-      writeSD("x", distanceTraveled-totalDistance);
+      writeSD("x", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
 
       break;
 
-     case 'h' :                  //Stop
-      
+    case 'h' :                  //Stop
+
       printTXT();
 
       break;
-      
+
     default :
       direction = 'n';
       break;
