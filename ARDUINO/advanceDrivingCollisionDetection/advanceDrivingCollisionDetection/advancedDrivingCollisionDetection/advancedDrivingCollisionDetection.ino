@@ -11,7 +11,12 @@ const int ECHO_PIN1 = A12;
 const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
 const int SDpin = 53;                      // this is the CS pin on the SD card breakout, change it if you choose a different pin.
-#define LED A8                             // Obstacle detection LED (RED)
+#define LED1 A9                             // Obstacle detection LED (RED)
+#define LED2 A7                             // Forward LED (BLUE)
+#define LED3 A8                             // Backward LED (RED) 
+#define LED4 A5                             // Turn left LED (GREEN)
+#define LED5 A10                            // Turn right LED (GREEN)
+
 Car car;
 
 Odometer odoLeft;
@@ -37,10 +42,6 @@ int extract() {
 int distanceTraveled() {
   int carDistance = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
   return carDistance;
-}
-
-void colToggle(bool collisionCotrol) {
-  collisionControl = !collisionControl;
 }
 
 /*
@@ -209,7 +210,11 @@ void setup() {
   odoRight.attach(TRIGER_ODOR_PIN);
   odoLeft.begin();
   odoRight.begin();
-  pinMode(LED, OUTPUT);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
+  pinMode(LED5, OUTPUT);
   initialiseSD(SDpin);
 
 }
@@ -219,8 +224,7 @@ void loop() {
   int d1 = US1.getDistance();               //get current distance from frontal US sensor
   int d2 = US2.getDistance();
 
-  boolean frontStop = false;
-  boolean backStop = false;
+
 
   char direction = 'n';
 
@@ -258,12 +262,20 @@ void loop() {
     case 'w':
 
       if (d1 > 2 && d1 < 30) {
-        digitalWrite(LED, HIGH);
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         eStop(extract(), extract());
 
 
       } else {
-        digitalWrite(LED, LOW);
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         moveFor(lSpeed, rSpeed);
 
       }
@@ -273,11 +285,19 @@ void loop() {
     case 's':
 
       if (d2 > 2 && d2 < 30) {
-        digitalWrite(LED, HIGH);
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         eStop(extract(), extract());
 
       } else {
-        digitalWrite(LED, LOW);
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, HIGH);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         moveBack(lSpeed, rSpeed);
 
       }
@@ -292,8 +312,6 @@ void loop() {
   char y = rData.charAt(0);
 
   switch (y) {
-    case 't' :                         //turn collision detection on/off
-      colToggle(collisionControl);
 
     case 'w' :                         //move forward
 
@@ -314,6 +332,11 @@ void loop() {
       rSpeed = extract();
       turn(lSpeed, rSpeed);
       writeSD("d", distanceTraveled);// ? take care of rotations
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
 
       break;
 
@@ -336,6 +359,11 @@ void loop() {
 
       dir = 'd';
       writeSD("a", distanceTraveled);
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
       break;
 
     case 'q' :                     //diagonal forward left turn
@@ -347,6 +375,11 @@ void loop() {
       dir = 'q';
       writeSD("c", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
 
       break;
 
@@ -359,6 +392,11 @@ void loop() {
       dir = 'e';
       writeSD("z", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, HIGH);
 
       break;
 
@@ -371,6 +409,11 @@ void loop() {
       dir = 'z';
       writeSD("e", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
 
       break;
 
@@ -383,6 +426,11 @@ void loop() {
       dir = 'c';
       writeSD("q", distanceTraveled - totalDistance);
       totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
 
       break;
 
