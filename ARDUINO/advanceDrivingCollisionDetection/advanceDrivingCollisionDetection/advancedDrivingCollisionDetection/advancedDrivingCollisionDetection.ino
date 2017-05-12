@@ -12,10 +12,10 @@ const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
 const int SDpin = 53;                      // this is the CS pin on the SD card breakout, change it if you choose a different pin.
 #define LED1 A9                             // Obstacle detection LED (RED)
-#define LED2 A7                             // Forward LED (BLUE)
+#define LED2 A7                             // Forward LED (GREEN)
 #define LED3 A8                             // Backward LED (RED) 
-#define LED4 A5                             // Turn left LED (GREEN)
-#define LED5 A10                            // Turn right LED (GREEN)
+#define LED4 A5                             // Turn left LED (BLUE)
+#define LED5 A10                            // Turn right LED (BLUE)
 
 Car car;
 
