@@ -395,7 +395,7 @@ void loop() {
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, HIGH);
       digitalWrite(LED3, LOW);
-      digitalWrite(LED4, HIGH);
+      digitalWrite(LED4, LOW);
       digitalWrite(LED5, HIGH);
 
       break;
