@@ -192,39 +192,47 @@ void writeSD(String command, int distanceTraveled) {
 
 void BT() {
   File myFile = SD.open("datalog.txt");
+  // declare a variable to get number of lines in text file
   int i = 0;
+  // declare a variable to save total distance during the travel
   int tatalDistance;
-
+  // open the file for count of lines
   while (myFile.available()) {
     String list = myFile.readStringUntil('\n');
     tatalDistance = list.substring(1).toInt();
     i++;
   }
   myFile.close();
-
+  // create 2 arrays of length of count of text file lines save commands and distance should be taken
   char BTcommands[i];
   int BTdistance[i];
-  
+  // decrease "i" because i am not intrested in the last value anymore
   i--;
   File myFile1 = SD.open("datalog.txt");
+  // put everything into arrays in reverse order..
   while (myFile1.available()) {
     String list = myFile1.readStringUntil('\n');
     BTcommands[i] = list.charAt(0);
+    // to find the distance has been taken just for this command after the command before this
     BTdistance[i] = tatalDistance - list.substring(1).toInt();
 
     i--;
   }
   myFile1.close();
   car.rotate(180);
+  // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
-
+    // since odometer values increas so i am resetting it by take modulu by total distance have saved before
+    // and i am not intressed in x commands that stops the car..
     while ( (distanceTraveled() % tatalDistance) < BTdistance[m] && BTcommands[m] != 'x') {
       char tmpCMD = BTcommands[m];
+      // if we reach the total distance that is saved the car stops
       if ((distanceTraveled() % tatalDistance) + 1 >= BTdistance[sizeof(BTcommands) - 1]) {
         car.stop();
         break;
 
       }
+      // executes commands default speed is 50
       switch (tmpCMD) {
         case 'w' :
           car.setMotorSpeed(50, 50);
@@ -255,6 +263,7 @@ void BT() {
       }
     }
   }
+  // after we are done with backtracking, remove the savec file..
   SD.remove("datalog.txt");
 }
 
@@ -274,6 +283,7 @@ void setup() {
   pinMode(LED4, OUTPUT);
   pinMode(LED5, OUTPUT);
   initialiseSD(SDpin);
+  // remove the file if it exists to avoid executing the old routes
   SD.remove("datalog.txt");
 }
 
@@ -367,7 +377,7 @@ void loop() {
   */
 
   char y = rData.charAt(0);
-
+  // if y is not null we are saving the commands and the distance has been traveled to the file
   if (y != '\0' && y != 'h') {
     writeSD(String(y), distanceTraveled());
   }
@@ -485,7 +495,7 @@ void loop() {
       dir = 'x';
 
       break;
-
+    // backtarcking case...
     case 'h' :
       BT();
       break;
