@@ -29,7 +29,6 @@ int rSpeed;
 String rData;
 bool collisionControl = true;             //toggle variable for collision control true by default
 char dir;
-int totalDistance = 0;
 
 /*
    A method that splits up the string and set 1. and 2. char of it as speed
@@ -111,10 +110,6 @@ void printTXT() {
 
 }
 
-
-
-
-
 void initialiseSD(int pin) {
 
   //use this function whenever you want to verify that the SD card is working properly
@@ -151,10 +146,7 @@ void writeSD(String command, int distanceTraveled) {
 
   if (dataFile) {
 
-    distanceTraveled = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
     dataFile.println(command + distanceTraveled);
-
-    Serial.println(command + distanceTraveled);
 
     dataFile.close();
   }
@@ -198,7 +190,73 @@ void writeSD(String command, int distanceTraveled) {
 //}
 
 
+void BT() {
+  File myFile = SD.open("datalog.txt");
+  int i = 0;
+  int tatalDistance;
 
+  while (myFile.available()) {
+    String list = myFile.readStringUntil('\n');
+    tatalDistance = list.substring(1).toInt();
+    i++;
+  }
+  myFile.close();
+
+  char BTcommands[i];
+  int BTdistance[i];
+  
+  i--;
+  File myFile1 = SD.open("datalog.txt");
+  while (myFile1.available()) {
+    String list = myFile1.readStringUntil('\n');
+    BTcommands[i] = list.charAt(0);
+    BTdistance[i] = tatalDistance - list.substring(1).toInt();
+
+    i--;
+  }
+  myFile1.close();
+  car.rotate(180);
+  for (int m = 0; m < sizeof(BTcommands); m++) {
+
+    while ( (distanceTraveled() % tatalDistance) < BTdistance[m] && BTcommands[m] != 'x') {
+      char tmpCMD = BTcommands[m];
+      if ((distanceTraveled() % tatalDistance) + 1 >= BTdistance[sizeof(BTcommands) - 1]) {
+        car.stop();
+        break;
+
+      }
+      switch (tmpCMD) {
+        case 'w' :
+          car.setMotorSpeed(50, 50);
+          break;
+        case 'a' :
+          car.setMotorSpeed(-50, 50);
+          break;
+        case 's' :
+          car.setMotorSpeed(-50, -50);
+          break;
+        case 'd' :
+          car.setMotorSpeed(50, -50);
+          break;
+        case 'q' :
+          car.setMotorSpeed(25, 50);
+          break;
+        case 'e' :
+          car.setMotorSpeed(50, 25);
+          break;
+        case 'z' :
+          car.setMotorSpeed(-25, -50);
+          break;
+        case 'c' :
+          car.setMotorSpeed(-50, -25);
+          break;
+        default :
+          break;
+      }
+    }
+  }
+  SD.remove("datalog.txt");
+}
 
 void setup() {
   Serial.begin(9600);
@@ -216,7 +274,7 @@ void setup() {
   pinMode(LED4, OUTPUT);
   pinMode(LED5, OUTPUT);
   initialiseSD(SDpin);
-
+  SD.remove("datalog.txt");
 }
 
 void loop() {
@@ -226,7 +284,6 @@ void loop() {
 
 
 
-  char direction = 'n';
 
   if (Serial2.available() > 0) {
 
@@ -311,6 +368,10 @@ void loop() {
 
   char y = rData.charAt(0);
 
+  if (y != '\0' && y != 'h') {
+    writeSD(String(y), distanceTraveled());
+  }
+  
   switch (y) {
 
     case 'w' :                         //move forward
@@ -320,10 +381,6 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'w';
-
-      //     Serial.print();
-      writeSD("s", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       break;
 
     case 'a' :                       //turn in-place to the left (more of a drift in place)
@@ -331,7 +388,6 @@ void loop() {
       lSpeed = -extract();
       rSpeed = extract();
       turn(lSpeed, rSpeed);
-      writeSD("d", distanceTraveled);// ? take care of rotations
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
@@ -347,8 +403,6 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 's';
-      writeSD("w", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       break;
 
     case 'd' :                      //turn in-place to the right (more of a drift in place)
@@ -358,7 +412,6 @@ void loop() {
       turn(lSpeed, rSpeed);
 
       dir = 'd';
-      writeSD("a", distanceTraveled);
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
@@ -373,8 +426,6 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'q';
-      writeSD("c", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, HIGH);
       digitalWrite(LED3, LOW);
@@ -390,8 +441,6 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'e';
-      writeSD("z", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, HIGH);
       digitalWrite(LED3, LOW);
@@ -407,8 +456,6 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 'z';
-      writeSD("e", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, HIGH);
@@ -424,8 +471,6 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 'c';
-      writeSD("q", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, HIGH);
@@ -438,19 +483,14 @@ void loop() {
       eStop(extract(), extract());
 
       dir = 'x';
-      writeSD("x", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
 
       break;
 
-    case 'h' :                  //Stop
-
-      printTXT();
-
+    case 'h' :
+      BT();
       break;
-
+      
     default :
-      direction = 'n';
       break;
   }
 
