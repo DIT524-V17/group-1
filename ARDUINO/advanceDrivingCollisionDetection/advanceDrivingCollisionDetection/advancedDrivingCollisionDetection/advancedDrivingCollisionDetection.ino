@@ -202,15 +202,30 @@ void BT() {
 
       }
       // executes commands default speed is 50
+      int d1 = US1.getDistance();               //get current distance from frontal US sensor
+      int d2 = US2.getDistance();
+      // executes commands default speed is 50
       switch (tmpCMD) {
         case 'w' :
-          car.setMotorSpeed(50, 50);
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.stop();
+          } else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(50, 50);
+          }
           break;
         case 'a' :
           car.setMotorSpeed(-50, 50);
           break;
         case 's' :
-          car.setMotorSpeed(-50, -50);
+          if (d2 > 2 && d2 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.stop();
+          } else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(-50, -50);
+          }
           break;
         case 'd' :
           car.setMotorSpeed(50, -50);
