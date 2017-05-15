@@ -11,7 +11,12 @@ const int ECHO_PIN1 = A12;
 const int TRIGGER_PIN2 = A13;
 const int ECHO_PIN2 = A14;
 const int SDpin = 53;                      // this is the CS pin on the SD card breakout, change it if you choose a different pin.
-#define LED A8                             // Obstacle detection LED (RED)
+#define LED1 A9                             // Obstacle detection LED (RED)
+#define LED2 A7                             // Forward LED (GREEN)
+#define LED3 A8                             // Backward LED (RED) 
+#define LED4 A5                             // Turn left LED (BLUE)
+#define LED5 A10                            // Turn right LED (BLUE)
+
 Car car;
 
 Odometer odoLeft;
@@ -22,9 +27,7 @@ SR04 US2;                                 //Back US sensor
 int lSpeed;
 int rSpeed;
 String rData;
-bool collisionControl = true;             //toggle variable for collision control true by default
 char dir;
-int totalDistance = 0;
 
 /*
    A method that splits up the string and set 1. and 2. char of it as speed
@@ -37,10 +40,6 @@ int extract() {
 int distanceTraveled() {
   int carDistance = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
   return carDistance;
-}
-
-void colToggle(bool collisionCotrol) {
-  collisionControl = !collisionControl;
 }
 
 /*
@@ -110,10 +109,6 @@ void printTXT() {
 
 }
 
-
-
-
-
 void initialiseSD(int pin) {
 
   //use this function whenever you want to verify that the SD card is working properly
@@ -150,10 +145,7 @@ void writeSD(String command, int distanceTraveled) {
 
   if (dataFile) {
 
-    distanceTraveled = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
     dataFile.println(command + distanceTraveled);
-
-    Serial.println(command + distanceTraveled);
 
     dataFile.close();
   }
@@ -166,38 +158,98 @@ void writeSD(String command, int distanceTraveled) {
 }
 
 
-//void startRetracing() {
-//
-//  File myFile = SD.open("datalog.txt");
-//
-//  if (myFile) {
-//
-//    // read from the file until there's nothing else in it:
-//
-//    while (myFile.available()) {
-//
-//      Serial.write(myFile.seek(0));
-//
-//      Serial.write(myFile.read());
-//
-//    }
-//
-//    // close the file:
-//
-//    myFile.close();
-//
-//  } else {
-//
-//    // if the file didn't open, print an error:
-//
-//    Serial.println("error opening test.txt");
-//
-//  }
-//
-//}
 
+void BT() {
+  File myFile = SD.open("datalog.txt");
+  // declare a variable to get the number of lines in the text file
+  int i = 0;
+  // declare a variable to save the total distance during traveling
+  int tatalDistance;
+  // open the file to count the lines
+  while (myFile.available()) {
+    String list = myFile.readStringUntil('\n');
+    tatalDistance = list.substring(1).toInt();
+    i++;
+  }
+  myFile.close();
+  // create 2 arrays with the length of the text file's lines, save commands and distance should be taken
+  char BTcommands[i];
+  int BTdistance[i];
+  // decrease "i" because i am not intrested in the last value anymore
+  i--;
+  File myFile1 = SD.open("datalog.txt");
+  // put everything into arrays in reverse order..
+  while (myFile1.available()) {
+    String list = myFile1.readStringUntil('\n');
+    BTcommands[i] = list.charAt(0);
+    // to find the distance has been taken just for this command after the command before this
+    BTdistance[i] = tatalDistance - list.substring(1).toInt();
 
+    i--;
+  }
+  myFile1.close();
+  car.rotate(180);
+  // read everythings in arrays
+  for (int m = 0; m < sizeof(BTcommands); m++) {
+    // since odometer values are increasing, i am resetting it by taking the modulus of total distance
+    // and i am not intressed in x commands that stops the car..
+    while ( (distanceTraveled() % tatalDistance) < BTdistance[m] && BTcommands[m] != 'x') {
+      char tmpCMD = BTcommands[m];
+      // if we reach the total distance that is saved, then the car stops
+      if ((distanceTraveled() % tatalDistance) + 1 >= BTdistance[sizeof(BTcommands) - 1]) {
+        car.stop();
+        break;
 
+      }
+      // executes commands default speed is 50
+      int d1 = US1.getDistance();               //get current distance from frontal US sensor
+      int d2 = US2.getDistance();
+      // executes commands default speed is 50
+      switch (tmpCMD) {
+        case 'w' :
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.stop();
+          } else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(50, 50);
+          }
+          break;
+        case 'a' :
+          car.setMotorSpeed(-50, 50);
+          break;
+        case 's' :
+          if (d2 > 2 && d2 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.stop();
+          } else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(-50, -50);
+          }
+          break;
+        case 'd' :
+          car.setMotorSpeed(50, -50);
+          break;
+        case 'q' :
+          car.setMotorSpeed(25, 50);
+          break;
+        case 'e' :
+          car.setMotorSpeed(50, 25);
+          break;
+        case 'z' :
+          car.setMotorSpeed(-25, -50);
+          break;
+        case 'c' :
+          car.setMotorSpeed(-50, -25);
+          break;
+        default :
+          break;
+      }
+    }
+  }
+  // after we are done with backtracking, remove the saved file..
+  SD.remove("datalog.txt");
+}
 
 void setup() {
   Serial.begin(9600);
@@ -209,9 +261,14 @@ void setup() {
   odoRight.attach(TRIGER_ODOR_PIN);
   odoLeft.begin();
   odoRight.begin();
-  pinMode(LED, OUTPUT);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
+  pinMode(LED5, OUTPUT);
   initialiseSD(SDpin);
-
+  // remove any existing log file to avoid executing the old routes
+  SD.remove("datalog.txt");
 }
 
 void loop() {
@@ -219,10 +276,8 @@ void loop() {
   int d1 = US1.getDistance();               //get current distance from frontal US sensor
   int d2 = US2.getDistance();
 
-  boolean frontStop = false;
-  boolean backStop = false;
 
-  char direction = 'n';
+
 
   if (Serial2.available() > 0) {
 
@@ -258,12 +313,20 @@ void loop() {
     case 'w':
 
       if (d1 > 2 && d1 < 30) {
-        digitalWrite(LED, HIGH);
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         eStop(extract(), extract());
 
 
       } else {
-        digitalWrite(LED, LOW);
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         moveFor(lSpeed, rSpeed);
 
       }
@@ -273,11 +336,19 @@ void loop() {
     case 's':
 
       if (d2 > 2 && d2 < 30) {
-        digitalWrite(LED, HIGH);
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         eStop(extract(), extract());
 
       } else {
-        digitalWrite(LED, LOW);
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, HIGH);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
         moveBack(lSpeed, rSpeed);
 
       }
@@ -290,10 +361,12 @@ void loop() {
   */
 
   char y = rData.charAt(0);
+  // if y is not null we are saving the commands and the distance has been traveled to the file
+  if (y != '\0' && y != 'h') {
+    writeSD(String(y), distanceTraveled());
+  }
 
   switch (y) {
-    case 't' :                         //turn collision detection on/off
-      colToggle(collisionControl);
 
     case 'w' :                         //move forward
 
@@ -302,10 +375,6 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'w';
-
-      //     Serial.print();
-      writeSD("s", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       break;
 
     case 'a' :                       //turn in-place to the left (more of a drift in place)
@@ -313,7 +382,11 @@ void loop() {
       lSpeed = -extract();
       rSpeed = extract();
       turn(lSpeed, rSpeed);
-      writeSD("d", distanceTraveled);// ? take care of rotations
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
 
       break;
 
@@ -324,8 +397,6 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 's';
-      writeSD("w", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
       break;
 
     case 'd' :                      //turn in-place to the right (more of a drift in place)
@@ -335,7 +406,11 @@ void loop() {
       turn(lSpeed, rSpeed);
 
       dir = 'd';
-      writeSD("a", distanceTraveled);
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
       break;
 
     case 'q' :                     //diagonal forward left turn
@@ -345,8 +420,11 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'q';
-      writeSD("c", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
 
       break;
 
@@ -357,8 +435,11 @@ void loop() {
       moveFor(lSpeed, rSpeed);
 
       dir = 'e';
-      writeSD("z", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
 
       break;
 
@@ -369,8 +450,11 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 'z';
-      writeSD("e", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
 
       break;
 
@@ -381,28 +465,36 @@ void loop() {
       moveBack(lSpeed, rSpeed);
 
       dir = 'c';
-      writeSD("q", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
 
       break;
 
     case 'x' :                  //Stop
       eStop(extract(), extract());
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, LOW);
 
       dir = 'x';
-      writeSD("x", distanceTraveled - totalDistance);
-      totalDistance = distanceTraveled;
 
       break;
+    // backtracking case...
+    case 'h' :
+      BT();
+      break;
 
-    case 'h' :                  //Stop
-
+    //print log file to monitor case
+    case 'j' :
       printTXT();
-
       break;
 
     default :
-      direction = 'n';
       break;
   }
 
