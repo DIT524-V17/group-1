@@ -471,7 +471,7 @@ void loop() {
 
     //print log file to monitor case
     case 'j' :
-      printTXT()
+      printTXT();
       break;
 
     default :
