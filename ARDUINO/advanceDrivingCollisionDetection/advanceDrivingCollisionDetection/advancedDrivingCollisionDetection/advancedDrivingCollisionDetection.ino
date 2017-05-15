@@ -460,6 +460,11 @@ void loop() {
 
     case 'x' :                  //Stop
       eStop(extract(), extract());
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, LOW);
 
       dir = 'x';
 
