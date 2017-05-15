@@ -27,7 +27,6 @@ SR04 US2;                                 //Back US sensor
 int lSpeed;
 int rSpeed;
 String rData;
-bool collisionControl = true;             //toggle variable for collision control true by default
 char dir;
 
 /*
@@ -351,7 +350,7 @@ void loop() {
   if (y != '\0' && y != 'h') {
     writeSD(String(y), distanceTraveled());
   }
-  
+
   switch (y) {
 
     case 'w' :                         //move forward
@@ -474,7 +473,7 @@ void loop() {
     case 'j' :
       printTXT()
       break;
-      
+
     default :
       break;
   }
