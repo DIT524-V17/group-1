@@ -465,9 +465,14 @@ void loop() {
       dir = 'x';
 
       break;
-    // backtarcking case...
+    // backtracking case...
     case 'h' :
       BT();
+      break;
+
+    //print log file to monitor case
+    case 'j' :
+      printTXT()
       break;
       
     default :
