@@ -159,51 +159,21 @@ void writeSD(String command, int distanceTraveled) {
 }
 
 
-//void startRetracing() {
-//
-//  File myFile = SD.open("datalog.txt");
-//
-//  if (myFile) {
-//
-//    // read from the file until there's nothing else in it:
-//
-//    while (myFile.available()) {
-//
-//      Serial.write(myFile.seek(0));
-//
-//      Serial.write(myFile.read());
-//
-//    }
-//
-//    // close the file:
-//
-//    myFile.close();
-//
-//  } else {
-//
-//    // if the file didn't open, print an error:
-//
-//    Serial.println("error opening test.txt");
-//
-//  }
-//
-//}
-
 
 void BT() {
   File myFile = SD.open("datalog.txt");
-  // declare a variable to get number of lines in text file
+  // declare a variable to get the number of lines in the text file
   int i = 0;
-  // declare a variable to save total distance during the travel
+  // declare a variable to save the total distance during traveling
   int tatalDistance;
-  // open the file for count of lines
+  // open the file to count the lines
   while (myFile.available()) {
     String list = myFile.readStringUntil('\n');
     tatalDistance = list.substring(1).toInt();
     i++;
   }
   myFile.close();
-  // create 2 arrays of length of count of text file lines save commands and distance should be taken
+  // create 2 arrays with the length of the text file's lines, save commands and distance should be taken
   char BTcommands[i];
   int BTdistance[i];
   // decrease "i" because i am not intrested in the last value anymore
@@ -222,11 +192,11 @@ void BT() {
   car.rotate(180);
   // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
-    // since odometer values increas so i am resetting it by take modulu by total distance have saved before
+    // since odometer values are increasing, i am resetting it by taking the modulus of total distance
     // and i am not intressed in x commands that stops the car..
     while ( (distanceTraveled() % tatalDistance) < BTdistance[m] && BTcommands[m] != 'x') {
       char tmpCMD = BTcommands[m];
-      // if we reach the total distance that is saved the car stops
+      // if we reach the total distance that is saved, then the car stops
       if ((distanceTraveled() % tatalDistance) + 1 >= BTdistance[sizeof(BTcommands) - 1]) {
         car.stop();
         break;
@@ -263,7 +233,7 @@ void BT() {
       }
     }
   }
-  // after we are done with backtracking, remove the savec file..
+  // after we are done with backtracking, remove the saved file..
   SD.remove("datalog.txt");
 }
 
@@ -283,7 +253,7 @@ void setup() {
   pinMode(LED4, OUTPUT);
   pinMode(LED5, OUTPUT);
   initialiseSD(SDpin);
-  // remove the file if it exists to avoid executing the old routes
+  // remove any existing log file to avoid executing the old routes
   SD.remove("datalog.txt");
 }
 
