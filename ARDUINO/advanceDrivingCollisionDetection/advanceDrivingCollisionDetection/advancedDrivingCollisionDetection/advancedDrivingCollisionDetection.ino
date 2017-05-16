@@ -216,7 +216,7 @@ void BT() {
           }
           break;
         case 'a' :
-          car.setMotorSpeed(-50, 50);
+          car.setMotorSpeed(50, -50);
           break;
         case 's' :
           if (d2 > 2 && d2 < 30) {
@@ -228,7 +228,7 @@ void BT() {
           }
           break;
         case 'd' :
-          car.setMotorSpeed(50, -50);
+          car.setMotorSpeed(-50, 50);
           break;
         case 'q' :
           car.setMotorSpeed(25, 50);
