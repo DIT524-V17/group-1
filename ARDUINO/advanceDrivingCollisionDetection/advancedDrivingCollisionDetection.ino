@@ -27,7 +27,6 @@ SR04 US2;                                 //Back US sensor
 int lSpeed;
 int rSpeed;
 String rData;
-char dir;
 
 /*
    A method that splits up the string and set 1. and 2. char of it as speed
@@ -305,13 +304,22 @@ void loop() {
   }
 
   /*
-      A switch case that makes sure that the car
-      will stop according to the car's directions.
-      Also, it will turn on the red led if there is any obstacle
+       A switch case that controls the car movement
   */
-  switch (dir) {
-    case 'w':
 
+  char y = rData.charAt(0);
+  // if y is not null we are saving the commands and the distance has been traveled to the file
+  if (y != '\0' && y != 'h') {
+    writeSD(String(y), distanceTraveled());
+  }
+
+  switch (y) {
+
+    case 'w' :                         //move forward
+
+      lSpeed = extract();
+      rSpeed = extract();
+      
       if (d1 > 2 && d1 < 30) {
         digitalWrite(LED1, HIGH);
         digitalWrite(LED2, LOW);
@@ -319,7 +327,6 @@ void loop() {
         digitalWrite(LED4, LOW);
         digitalWrite(LED5, LOW);
         eStop(extract(), extract());
-
 
       } else {
         digitalWrite(LED1, LOW);
@@ -330,11 +337,28 @@ void loop() {
         moveFor(lSpeed, rSpeed);
 
       }
+      
+      break;
+
+    case 'a' :                       //turn in-place to the left (more of a drift in place)
+
+      lSpeed = -extract();
+      rSpeed = extract();
+      turn(lSpeed, rSpeed);
+      
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
 
       break;
 
-    case 's':
+    case 's' :                        //move backward
 
+      lSpeed = -extract();
+      rSpeed = -extract();
+      
       if (d2 > 2 && d2 < 30) {
         digitalWrite(LED1, HIGH);
         digitalWrite(LED2, LOW);
@@ -352,51 +376,6 @@ void loop() {
         moveBack(lSpeed, rSpeed);
 
       }
-
-      break;
-  }
-
-  /*
-       A switch case that controls the car movement
-  */
-
-  char y = rData.charAt(0);
-  // if y is not null we are saving the commands and the distance has been traveled to the file
-  if (y != '\0' && y != 'h') {
-    writeSD(String(y), distanceTraveled());
-  }
-
-  switch (y) {
-
-    case 'w' :                         //move forward
-
-      lSpeed = extract();
-      rSpeed = extract();
-      moveFor(lSpeed, rSpeed);
-
-      dir = 'w';
-      break;
-
-    case 'a' :                       //turn in-place to the left (more of a drift in place)
-
-      lSpeed = -extract();
-      rSpeed = extract();
-      turn(lSpeed, rSpeed);
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, HIGH);
-      digitalWrite(LED5, LOW);
-
-      break;
-
-    case 's' :                        //move backward
-
-      lSpeed = -extract();
-      rSpeed = -extract();
-      moveBack(lSpeed, rSpeed);
-
-      dir = 's';
       break;
 
     case 'd' :                      //turn in-place to the right (more of a drift in place)
@@ -405,7 +384,6 @@ void loop() {
       rSpeed = -extract();
       turn(lSpeed, rSpeed);
 
-      dir = 'd';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
@@ -419,7 +397,6 @@ void loop() {
       rSpeed = extract();
       moveFor(lSpeed, rSpeed);
 
-      dir = 'q';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, HIGH);
       digitalWrite(LED3, LOW);
@@ -434,7 +411,6 @@ void loop() {
       rSpeed = extract() / 2;
       moveFor(lSpeed, rSpeed);
 
-      dir = 'e';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, HIGH);
       digitalWrite(LED3, LOW);
@@ -449,7 +425,6 @@ void loop() {
       rSpeed = -extract();
       moveBack(lSpeed, rSpeed);
 
-      dir = 'z';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, HIGH);
@@ -464,7 +439,6 @@ void loop() {
       rSpeed = -(extract() / 2);
       moveBack(lSpeed, rSpeed);
 
-      dir = 'c';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, HIGH);
@@ -478,10 +452,7 @@ void loop() {
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
-      digitalWrite(LED4, LOW);
       digitalWrite(LED5, LOW);
-
-      dir = 'x';
 
       break;
     // backtracking case...
