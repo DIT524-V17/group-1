@@ -41,4 +41,4 @@ These are the parts we used in the M.A.C smartcar project:
 |  1	|  MicroSD Card Module for arduino | variant variant 1; chip PG6SD  |
 |  1	| Raspberry Pi 2 Model B | processor Broadcom BCM2836 ARMv7; variant Raspberry Pi 2 Model B  |
 |  1	| SG90 Micro Servo Motor | 9G RC Robot Helicopter Airplane Boat Controls  |
-|  1	| Microsoft Xbox 360 Wireless Receiver | Item model number: 882224248495  |
+|  1	| Microsoft Xbox 360 Wireless Receiver | item model number: 882224248495  |
