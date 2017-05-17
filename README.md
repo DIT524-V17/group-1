@@ -1,23 +1,23 @@
 # Group-1
 
-# [Project M.A.C]
+ [Project M.A.C]
 
-# The Marvelous Amazing 👀 Car!
+ The Marvelous Amazing 👀 Car!
 
 
 
 # [Circuit diagrams of our car 🔎](https://github.com/DIT524-V17/group-1/tree/master/Circuit_Diagram)
 
 
- # Circuit Diagram
+  Circuit Diagram
 
 ![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/Circuit_Diagram_for_SmartCar.png)
 
- # Schematic Circuit Diagram
+  Schematic Circuit Diagram
 
 ![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/Schematic_Circuit_Diagram_for_SmartCar.png)
 
- # PCB Circuit Diagram
+  PCB Circuit Diagram
 
 ![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/PCB_Circuit_Diagram_for_SmartCar.png)
 
