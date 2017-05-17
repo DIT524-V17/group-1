@@ -11,15 +11,15 @@
 
   Circuit Diagram
 
-![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/Circuit_Diagram_for_SmartCar.png)
+![alt text](https://github.com/DIT524-V17/group-1/blob/master/Circuit_Diagram/Circuit_Diagram_for_SmartCar.png)
 
   Schematic Circuit Diagram
 
-![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/Schematic_Circuit_Diagram_for_SmartCar.png)
+![alt text](https://github.com/DIT524-V17/group-1/blob/master/Circuit_Diagram/Schematic_Circuit_Diagram_for_SmartCar.png)
 
   PCB Circuit Diagram
 
-![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/PCB_Circuit_Diagram_for_SmartCar.png)
+![alt text](https://github.com/DIT524-V17/group-1/blob/master/Circuit_Diagram/PCB_Circuit_Diagram_for_SmartCar.png)
 
 
 
