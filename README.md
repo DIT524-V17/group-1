@@ -2,15 +2,22 @@
 
 # [Project M.A.C]
 
-The Marvelous Amazing 👀 Car!
+# The Marvelous Amazing 👀 Car!
 
 
 
 # [Circuit diagrams of our car 🔎](https://github.com/DIT524-V17/group-1/tree/master/Circuit_Diagram)
 
+
+ # Circuit Diagram
+
 ![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/Circuit_Diagram_for_SmartCar.png)
 
+ # Schematic Circuit Diagram
+
 ![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/Schematic_Circuit_Diagram_for_SmartCar.png)
+
+ # PCB Circuit Diagram
 
 ![alt text](https://github.com/DIT524-V17/group-1/blob/dev/Circuit_Diagram/PCB_Circuit_Diagram_for_SmartCar.png)
 
@@ -24,7 +31,7 @@ These are the parts we used in the M.A.C smartcar project:
 |---	|---	|---	| 
 |  1	|  Powerbank-7800mAh	  |  	2.1 A charger  |
 |  1	| Arduino Mega 2560 (Rev3)	|  type Arduino MEGA 2560 (Rev3)  |
-|  1	|  4 x AAA Battery Mount |  	voltage 12V  |
+|  1	|  8 x AAA Battery Mount |  	voltage 12V  |
 |  1	| Bluetooth HC-06d | 	pins 4; package THT; variant variant 7; pin spacing 0.1in (2.54mm); row single  |
 |  4 	| DC Motor  |   |
 |  2  |  hc-sr04 ultrasonic sensor  | variant hc-sr04  |
