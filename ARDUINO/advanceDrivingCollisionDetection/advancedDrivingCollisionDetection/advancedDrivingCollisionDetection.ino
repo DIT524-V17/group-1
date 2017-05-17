@@ -283,9 +283,9 @@ void setup() {
 
 void loop() {
 
-  int d1 = US1.getDistance();               //get current distance from frontal US sensor
-  int d2 = US2.getDistance();
-  Serial.print(avarageSpeed());
+  int d1 = US1.getDistance();               // Get current distance from frontal US sensor
+  int d2 = US2.getDistance();               // Get current distance from back US sensor
+  avarageSpeed();                           // Display the average speed
 
 
 
