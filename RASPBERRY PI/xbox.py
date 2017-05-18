@@ -53,9 +53,10 @@ while True:
                                 ser.write(b'z')
                         elif angle > 20 and angle < 70:
                                 ser.write(b'c')
-
-#               else:
-#                       print 'Hello You!!'
-#                       ser.write(b'x')
+                elif event.type == pygame.JOYBUTTONDOWN:
+                        if event.button == 1:
+                                ser.write(b'h')
+#                        if event.button == 6:
+#                                print 'button BACK'
                 ser.flushOutput()
                 pygame.event.clear()
