@@ -1,4 +1,4 @@
-// Package
+﻿// Package
 package com.bluetoothcontroller.bluetoothcontroller;
 
 // Joystickview
@@ -17,10 +17,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -185,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                         speedText.setText(speedData);
                         //sendSpeed(sendPower);
                     }
+
                 }
                 else {
                     // stop when nothing is held down
@@ -297,6 +300,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
+    // on click button to send data for activating backtracking
+    public void buttonOnClick(View v) {
+       Button button = (Button) v;
+        ((Button) v).setText("Backtracking");
+        sendData("h");
+
+    }
+
 
     // read speed data, from cars odometers
     private String readSpeed()  {
