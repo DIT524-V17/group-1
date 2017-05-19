@@ -22,7 +22,7 @@ const int SDpin = 53;                      // this is the CS pin on the SD card 
 Car car;
 
 /*
-  Left and right ÄOdometers
+  Left and right Odometers
 */
 Odometer odoLeft;
 Odometer odoRight;
