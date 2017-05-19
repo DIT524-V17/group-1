@@ -5,24 +5,33 @@
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
 
-//Analogue pins below
-const int TRIGGER_PIN1 = A11;
-const int ECHO_PIN1 = A12;
-const int TRIGGER_PIN2 = A13;
-const int ECHO_PIN2 = A14;
+/*
+   Analogue pins below
+*/
+const int TRIGGER_PIN1 = A11;              // Front Sensor
+const int ECHO_PIN1 = A12;                 // Front Sensor
+const int TRIGGER_PIN2 = A13;              // Back Sensor
+const int ECHO_PIN2 = A14;                 // Back Sensor
 const int SDpin = 53;                      // this is the CS pin on the SD card breakout, change it if you choose a different pin.
-#define LED1 A9                             // Obstacle detection LED (RED)
-#define LED2 A7                             // Forward LED (GREEN)
-#define LED3 A8                             // Backward LED (RED) 
-#define LED4 A5                             // Turn left LED (BLUE)
-#define LED5 A10                            // Turn right LED (BLUE)
+#define LED1 A9                            // Obstacle detection LED (RED)
+#define LED2 A7                            // Forward LED (GREEN)
+#define LED3 A8                            // Backward LED (RED) 
+#define LED4 A5                            // Turn left LED (BLUE)
+#define LED5 A10                           // Turn right LED (BLUE)
 
 Car car;
 
+/*
+  Left and right ÄOdometers
+*/
 Odometer odoLeft;
 Odometer odoRight;
-SR04 US1;                                 //Front US sensor
-SR04 US2;                                 //Back US sensor
+
+/*
+  Front and back US sensors
+*/
+SR04 US1;
+SR04 US2;
 
 int lSpeed;
 int rSpeed;
@@ -37,6 +46,9 @@ int extract() {
   return carSpeed;
 }
 
+/*
+   A method that returns the average traveled distance of the car
+*/
 int distanceTraveled() {
   int carDistance = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
   return carDistance;
@@ -106,9 +118,11 @@ void printTXT() {
     Serial.println("error opening test.txt");
 
   }
-
 }
 
+/*
+    A Method that checks up if the SD card is initialized or not
+*/
 void initialiseSD(int pin) {
 
   //use this function whenever you want to verify that the SD card is working properly
@@ -125,19 +139,16 @@ void initialiseSD(int pin) {
 
     return;
   }
-
   Serial.println("card initialized.");
 }
 
-
-
+/*
+    A Method that writes the entered commands and the the traveled distances to the textfile.
+    Note: Use this command when you want to write to the textfile.
+    Open the file. note that only one file can be open at a time,
+    so you have to close this one before opening another.
+*/
 void writeSD(String command, int distanceTraveled) {
-
-  //use this command when you want to write to the textfile.
-
-  // open the file. note that only one file can be open at a time,
-
-  // so you have to close this one before opening another.
 
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
@@ -158,7 +169,9 @@ void writeSD(String command, int distanceTraveled) {
 }
 
 
-
+/*
+    A Method that is responsible of reversing the car's track
+*/
 void BT() {
   File myFile = SD.open("datalog.txt");
   // declare a variable to get the number of lines in the text file
@@ -168,7 +181,7 @@ void BT() {
   // open the file to count the lines
   while (myFile.available()) {
     String list = myFile.readStringUntil('\n');
-    tatalDistance = list.substring(1).toInt() + 72;
+    tatalDistance = list.substring(1).toInt();
     i++;
   }
   myFile.close();
@@ -188,19 +201,7 @@ void BT() {
     i--;
   }
   myFile1.close();
-
-  // move the car 180 degrees
-  while (true) {
-    if (distanceTraveled() < tatalDistance) {
-      car.setMotorSpeed(50, -50);
-    }
-    else {
-      car.stop();
-      break;
-    }
-  }
-  delay(1000);
-  
+  car.rotate(180);
   // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
     // since odometer values are increasing, i am resetting it by taking the modulus of total distance
@@ -213,10 +214,16 @@ void BT() {
         break;
 
       }
-      // executes commands default speed is 50
-      int d1 = US1.getDistance();               //get current distance from frontal US sensor
+
+      /*
+         Get current distance from front and back US sensors
+      */
+      int d1 = US1.getDistance();
       int d2 = US2.getDistance();
-      // executes commands default speed is 50
+
+      /*
+         Executes commands default speed is 50
+      */
       switch (tmpCMD) {
         case 'w' :
           if (d1 > 2 && d1 < 30) {
@@ -265,7 +272,7 @@ void BT() {
 
 void setup() {
   Serial.begin(9600);
-  Serial2.begin(9600);
+  Serial2.begin(9600);                         //For XBOX controller
   US1.attach(TRIGGER_PIN1, ECHO_PIN1);
   US2.attach(TRIGGER_PIN2, ECHO_PIN2);
   car.begin();
@@ -285,12 +292,17 @@ void setup() {
 
 void loop() {
 
-  int d1 = US1.getDistance();               //get current distance from frontal US sensor
+  /*
+    Get current distance from front and back US sensors
+  */
+  int d1 = US1.getDistance();
   int d2 = US2.getDistance();
 
+  avarageSpeed();                           // Display the average speed
 
-
-
+  /*
+     Get the direction to drive from the XBOX controller
+  */
   if (Serial2.available() > 0) {
 
     while (rData.length() < 3) {
@@ -301,6 +313,9 @@ void loop() {
     }
   }
 
+  /*
+      Get the direction to drive from the Android/PC controller
+  */
   else if (Serial.available() > 0) {
 
     while (rData.length() < 1) {
@@ -317,9 +332,9 @@ void loop() {
   }
 
   /*
-      A switch case that makes sure that the car
-      will stop according to the car's directions.
-      Also, it will turn on the red led if there is any obstacle
+     A switch case that makes sure that the car
+     will stop according to the car's directions.
+     Also, it will turn on the red led if there is any obstacle
   */
   switch (dir) {
     case 'w':
@@ -346,6 +361,7 @@ void loop() {
       break;
 
     case 's':
+
 
       if (d2 > 2 && d2 < 30) {
         digitalWrite(LED1, HIGH);
