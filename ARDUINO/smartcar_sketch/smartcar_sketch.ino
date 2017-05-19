@@ -168,7 +168,7 @@ void BT() {
   // open the file to count the lines
   while (myFile.available()) {
     String list = myFile.readStringUntil('\n');
-    tatalDistance = list.substring(1).toInt();
+    tatalDistance = list.substring(1).toInt() + 72;
     i++;
   }
   myFile.close();
@@ -188,7 +188,19 @@ void BT() {
     i--;
   }
   myFile1.close();
-  car.rotate(180);
+
+  // move the car 180 degrees
+  while (true) {
+    if (distanceTraveled() < tatalDistance) {
+      car.setMotorSpeed(50, -50);
+    }
+    else {
+      car.stop();
+      break;
+    }
+  }
+  delay(1000);
+  
   // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
     // since odometer values are increasing, i am resetting it by taking the modulus of total distance
