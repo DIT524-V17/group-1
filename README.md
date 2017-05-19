@@ -1,9 +1,10 @@
-# Group-1
-
- [Project M.A.C]
+# [Project M.A.C]
 
  The Marvelous Amazing 👀 Car!
 
+
+[![Slack](https://img.shields.io/badge/Slack-channel-green.svg)](https://dit524-team1.slack.com/)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/DIT524-V17/group-1/blob/master/LICENSE)
 
 
 # [Circuit diagrams of our car 🔎](https://github.com/DIT524-V17/group-1/tree/master/Circuit_Diagram)
@@ -48,3 +49,6 @@ These are the parts we used in the M.A.C smartcar project:
 
 M. Murat Kan, Rashad Kamsheh, Jonathan Partain, Yazan Al Sahhar, Marko Stanoevich, Samer Daknache and Tor Nilsson.
 
+# Thank you 💙
+
+Smartcar platform, created by Dimitris Platis http://plat.is/smartcar
