@@ -55,3 +55,11 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
+
+*.swp
+.*.un~
+*~
+.DS_Store
+*.o
+*.a
+/test/build/
