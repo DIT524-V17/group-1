@@ -3,7 +3,7 @@
  The Marvelous Amazing 👀 Car!
 
 
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/DIT524-V17/group-1/blob/master/LICENSE)
+[![license](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/DIT524-V17/group-1/blob/master/LICENSE)
 
 
 # [Circuit diagrams of our car 🔎](https://github.com/DIT524-V17/group-1/tree/master/Circuit_Diagram)
