@@ -5,28 +5,38 @@
 const int TRIGER_ODOL_PIN = 2;
 const int TRIGER_ODOR_PIN = 3;
 
-//Analogue pins below
-const int TRIGGER_PIN1 = A11;
-const int ECHO_PIN1 = A12;
-const int TRIGGER_PIN2 = A13;
-const int ECHO_PIN2 = A14;
+/*
+   Analogue pins below
+*/
+const int TRIGGER_PIN1 = A11;              // Front Sensor
+const int ECHO_PIN1 = A12;                 // Front Sensor
+const int TRIGGER_PIN2 = A13;              // Back Sensor
+const int ECHO_PIN2 = A14;                 // Back Sensor
 const int SDpin = 53;                      // this is the CS pin on the SD card breakout, change it if you choose a different pin.
-#define LED1 A9                             // Obstacle detection LED (RED)
-#define LED2 A7                             // Forward LED (GREEN)
-#define LED3 A8                             // Backward LED (RED) 
-#define LED4 A5                             // Turn left LED (BLUE)
-#define LED5 A10                            // Turn right LED (BLUE)
+#define LED1 A9                            // Obstacle detection LED (RED)
+#define LED2 A7                            // Forward LED (GREEN)
+#define LED3 A8                            // Backward LED (RED) 
+#define LED4 A5                            // Turn left LED (BLUE)
+#define LED5 A10                           // Turn right LED (BLUE)
 
 Car car;
 
+/*
+  Left and right Odometers
+*/
 Odometer odoLeft;
 Odometer odoRight;
-SR04 US1;                                 //Front US sensor
-SR04 US2;                                 //Back US sensor
+
+/*
+  Front and back US sensors
+*/
+SR04 US1;
+SR04 US2;
 
 int lSpeed;
 int rSpeed;
 String rData;
+char dir;
 
 /*
    A method that splits up the string and set 1. and 2. char of it as speed
@@ -36,6 +46,9 @@ int extract() {
   return carSpeed;
 }
 
+/*
+   A method that returns the average traveled distance of the car
+*/
 int distanceTraveled() {
   int carDistance = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
   return carDistance;
@@ -105,9 +118,11 @@ void printTXT() {
     Serial.println("error opening test.txt");
 
   }
-
 }
 
+/*
+    A Method that checks up if the SD card is initialized or not
+*/
 void initialiseSD(int pin) {
 
   //use this function whenever you want to verify that the SD card is working properly
@@ -124,19 +139,16 @@ void initialiseSD(int pin) {
 
     return;
   }
-
   Serial.println("card initialized.");
 }
 
-
-
+/*
+    A Method that writes the entered commands and the the traveled distances to the textfile.
+    Note: Use this command when you want to write to the textfile.
+    Open the file. note that only one file can be open at a time,
+    so you have to close this one before opening another.
+*/
 void writeSD(String command, int distanceTraveled) {
-
-  //use this command when you want to write to the textfile.
-
-  // open the file. note that only one file can be open at a time,
-
-  // so you have to close this one before opening another.
 
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
@@ -157,7 +169,9 @@ void writeSD(String command, int distanceTraveled) {
 }
 
 
-
+/*
+    A Method that is responsible of reversing the car's track
+*/
 void BT() {
   File myFile = SD.open("datalog.txt");
   // declare a variable to get the number of lines in the text file
@@ -187,6 +201,18 @@ void BT() {
     i--;
   }
   myFile1.close();
+
+  // move the car 180 degrees
+  while (true) {
+    if (distanceTraveled() < tatalDistance) {
+      car.setMotorSpeed(50, -50);
+    }
+    else {
+      car.stop();
+      break;
+    }
+  }
+  delay(1000);
   car.rotate(180);
   // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
@@ -200,10 +226,16 @@ void BT() {
         break;
 
       }
-      // executes commands default speed is 50
-      int d1 = US1.getDistance();               //get current distance from frontal US sensor
+
+      /*
+         Get current distance from front and back US sensors
+      */
+      int d1 = US1.getDistance();
       int d2 = US2.getDistance();
-      // executes commands default speed is 50
+
+      /*
+         Executes commands default speed is 50
+      */
       switch (tmpCMD) {
         case 'w' :
           if (d1 > 2 && d1 < 30) {
@@ -252,7 +284,7 @@ void BT() {
 
 void setup() {
   Serial.begin(9600);
-  Serial2.begin(9600);
+  Serial2.begin(9600);                         //For XBOX controller
   US1.attach(TRIGGER_PIN1, ECHO_PIN1);
   US2.attach(TRIGGER_PIN2, ECHO_PIN2);
   car.begin();
@@ -272,12 +304,17 @@ void setup() {
 
 void loop() {
 
-  int d1 = US1.getDistance();               //get current distance from frontal US sensor
+  /*
+    Get current distance from front and back US sensors
+  */
+  int d1 = US1.getDistance();
   int d2 = US2.getDistance();
 
+  avarageSpeed();                           // Display the average speed
 
-
-
+  /*
+     Get the direction to drive from the XBOX controller
+  */
   if (Serial2.available() > 0) {
 
     while (rData.length() < 3) {
@@ -288,6 +325,9 @@ void loop() {
     }
   }
 
+  /*
+      Get the direction to drive from the Android/PC controller
+  */
   else if (Serial.available() > 0) {
 
     while (rData.length() < 1) {
@@ -301,6 +341,59 @@ void loop() {
         rData = String(m) + "50";
       }
     }
+  }
+
+  /*
+     A switch case that makes sure that the car
+     will stop according to the car's directions.
+     Also, it will turn on the red led if there is any obstacle
+  */
+  switch (dir) {
+    case 'w':
+
+      if (d1 > 2 && d1 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        eStop(extract(), extract());
+
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        moveFor(lSpeed, rSpeed);
+
+      }
+
+      break;
+
+    case 's':
+
+
+      if (d2 > 2 && d2 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        eStop(extract(), extract());
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, HIGH);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        moveBack(lSpeed, rSpeed);
+
+      }
+
+      break;
   }
 
   /*
@@ -319,25 +412,9 @@ void loop() {
 
       lSpeed = extract();
       rSpeed = extract();
-      
-      if (d1 > 2 && d1 < 30) {
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        eStop(extract(), extract());
+      moveFor(lSpeed, rSpeed);
 
-      } else {
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        moveFor(lSpeed, rSpeed);
-
-      }
-      
+      dir = 'w';
       break;
 
     case 'a' :                       //turn in-place to the left (more of a drift in place)
@@ -345,7 +422,6 @@ void loop() {
       lSpeed = -extract();
       rSpeed = extract();
       turn(lSpeed, rSpeed);
-      
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
@@ -358,24 +434,9 @@ void loop() {
 
       lSpeed = -extract();
       rSpeed = -extract();
-      
-      if (d2 > 2 && d2 < 30) {
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        eStop(extract(), extract());
+      moveBack(lSpeed, rSpeed);
 
-      } else {
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        moveBack(lSpeed, rSpeed);
-
-      }
+      dir = 's';
       break;
 
     case 'd' :                      //turn in-place to the right (more of a drift in place)
@@ -384,6 +445,7 @@ void loop() {
       rSpeed = -extract();
       turn(lSpeed, rSpeed);
 
+      dir = 'd';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
@@ -397,6 +459,7 @@ void loop() {
       rSpeed = extract();
       moveFor(lSpeed, rSpeed);
 
+      dir = 'q';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, HIGH);
       digitalWrite(LED3, LOW);
@@ -411,6 +474,7 @@ void loop() {
       rSpeed = extract() / 2;
       moveFor(lSpeed, rSpeed);
 
+      dir = 'e';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, HIGH);
       digitalWrite(LED3, LOW);
@@ -425,6 +489,7 @@ void loop() {
       rSpeed = -extract();
       moveBack(lSpeed, rSpeed);
 
+      dir = 'z';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, HIGH);
@@ -439,6 +504,7 @@ void loop() {
       rSpeed = -(extract() / 2);
       moveBack(lSpeed, rSpeed);
 
+      dir = 'c';
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, HIGH);
@@ -454,6 +520,8 @@ void loop() {
       digitalWrite(LED3, LOW);
       digitalWrite(LED4, LOW);
       digitalWrite(LED5, LOW);
+
+      dir = 'x';
 
       break;
     // backtracking case...
