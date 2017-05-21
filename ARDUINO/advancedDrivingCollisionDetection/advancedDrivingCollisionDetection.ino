@@ -201,6 +201,18 @@ void BT() {
     i--;
   }
   myFile1.close();
+
+  // move the car 180 degrees
+  while (true) {
+    if (distanceTraveled() < tatalDistance) {
+      car.setMotorSpeed(50, -50);
+    }
+    else {
+      car.stop();
+      break;
+    }
+  }
+  delay(1000);
   car.rotate(180);
   // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
