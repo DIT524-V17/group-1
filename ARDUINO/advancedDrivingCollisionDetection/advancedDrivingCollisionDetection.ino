@@ -38,6 +38,246 @@ int rSpeed;
 String rData;
 char dir;
 
+
+
+void setup() {
+  Serial.begin(9600);
+  Serial2.begin(9600);                         //For XBOX controller
+  US1.attach(TRIGGER_PIN1, ECHO_PIN1);
+  US2.attach(TRIGGER_PIN2, ECHO_PIN2);
+  car.begin();
+  odoLeft.attach(TRIGER_ODOL_PIN);
+  odoRight.attach(TRIGER_ODOR_PIN);
+  odoLeft.begin();
+  odoRight.begin();
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
+  pinMode(LED5, OUTPUT);
+  SD.begin(SDpin);
+  // remove any existing log file to avoid executing the old routes
+  SD.remove("datalog.txt");
+}
+
+void loop() {
+
+  /*
+    Get current distance from front and back US sensors
+  */
+  int d1 = US1.getDistance();
+  int d2 = US2.getDistance();
+
+  avarageSpeed();                           // Display the average speed
+
+  /*
+     Get the direction to drive from the XBOX controller
+  */
+  if (Serial2.available() > 0) {
+
+    while (rData.length() < 3) {
+      char m = Serial2.read(); //add clause for using both serials for debugging
+
+      rData += String(m);
+
+    }
+  }
+
+  /*
+      Get the direction to drive from the Android/PC controller
+  */
+  else if (Serial.available() > 0) {
+
+    while (rData.length() < 1) {
+      char m = Serial.read(); //add clause for using both serials for debugging
+
+      if ( m == 'x') {
+        rData = String(m) + "00";
+
+      }
+      else {
+        rData = String(m) + "50";
+      }
+    }
+  }
+
+  /*
+     A switch case that makes sure that the car
+     will stop according to the car's directions.
+     Also, it will turn on the red led if there is any obstacle
+  */
+  switch (dir) {
+    case 'w':
+
+      if (d1 > 2 && d1 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(0, 0);
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(lSpeed, rSpeed);
+      }
+      break;
+
+    case 's':
+      if (d2 > 2 && d2 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(0, 0);
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, HIGH);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+
+        car.setMotorSpeed(lSpeed, rSpeed);
+      }
+      break;
+  }
+
+  /*
+       A switch case that controls the car movement
+  */
+  char y = rData.charAt(0);
+  // if y is not null we are saving the commands and the distance has been traveled to the file
+  if (y != '\0' && y != 'h') {
+    writeSD(String(y), distanceTraveled());
+  }
+
+  switch (y) {
+
+    case 'w' :                         //move forward
+
+      lSpeed = extract();
+      rSpeed = extract();
+      car.setMotorSpeed(extract(), extract());
+      dir = 'w';
+      break;
+
+    case 'a' :                       //turn in-place to the left (more of a drift in place)
+
+      lSpeed = -extract();
+      rSpeed = extract();
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
+      car.setMotorSpeed(-extract(), extract());
+      dir = 'a';
+
+      break;
+
+    case 's' :                        //move backward
+
+      lSpeed = -extract();
+      rSpeed = -extract();
+      car.setMotorSpeed(-extract(), -extract());
+      dir = 's';
+      break;
+
+    case 'd' :                      //turn in-place to the right (more of a drift in place)
+
+      lSpeed = extract();
+      rSpeed = -extract();
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
+      car.setMotorSpeed(extract(), -extract());
+      dir = 'd';
+
+      break;
+
+    case 'q' :                     //diagonal forward left turn
+
+      lSpeed = extract() / 2;
+      rSpeed = extract();
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
+      car.setMotorSpeed(extract() / 2, extract());
+      dir = 'q';
+
+
+      break;
+
+    case 'e' :                    //diagonal forward right turn
+
+      lSpeed = extract();
+      rSpeed = extract() / 2;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
+      car.setMotorSpeed(extract(), extract() / 2);
+      dir = 'e';
+      break;
+
+    case 'z' :                    //diagonal backward left turn
+
+      lSpeed = -(extract() / 2);
+      rSpeed = -extract();
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, HIGH);
+      digitalWrite(LED5, LOW);
+      car.setMotorSpeed(-extract() / 2, -extract());;
+      dir = 'z';
+      break;
+
+    case 'c' :                   //diagonal backward right turn
+
+      lSpeed = -extract();
+      rSpeed = -(extract() / 2);
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED3, HIGH);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
+      car.setMotorSpeed(-extract(), -extract() / 2);
+      dir = 'c';
+      break;
+
+    case 'x' :                  //Stop
+      car.stop();
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, LOW);
+      dir = 'x';
+      break;
+
+    // backtracking case...
+    case 'h' :
+      BT();
+      break;
+
+    default :
+      break;
+  }
+  rData = "";
+}
+
 /*
    A method that splits up the string and set 1. and 2. char of it as speed
 */
@@ -55,91 +295,11 @@ int distanceTraveled() {
 }
 
 /*
-   A method that moves the car forward
-*/
-void moveFor(int lSpeed, int rSpeed) {
-  car.setMotorSpeed(lSpeed, rSpeed);
-}
-
-/*
-   A method that moves the car backward
-*/
-void moveBack(int lSpeed, int rSpeed) {
-  car.setMotorSpeed(lSpeed, rSpeed);
-}
-
-/*
-   A method that turns the car to left and right
-*/
-void turn(int lSpeed, int rSpeed) {
-  car.setMotorSpeed(lSpeed, rSpeed);
-}
-
-/*
-   A method that stops the car.
-*/
-void eStop(int lSpeed, int rSpeed) {
-  car.setMotorSpeed(-lSpeed, -rSpeed);
-  delay(100);
-  car.setMotorSpeed(0, 0);
-}
-
-/*
    A method that sends current speed to controller
 */
 void avarageSpeed() {
   float avarage = (odoLeft.getSpeed() + odoRight.getSpeed()) / 2;
   Serial.println(avarage);
-}
-
-/*
-    Method to read an entire txt file and print it on the monitor
-*/
-void printTXT() {
-  File myFile = SD.open("datalog.txt");
-
-  if (myFile) {
-
-    // read from the file until there's nothing else in it:
-
-    while (myFile.available()) {
-
-      Serial.write(myFile.read());
-    }
-
-    // close the file:
-
-    myFile.close();
-
-  } else {
-
-    // if the file didn't open, print an error:
-
-    Serial.println("error opening test.txt");
-
-  }
-}
-
-/*
-    A Method that checks up if the SD card is initialized or not
-*/
-void initialiseSD(int pin) {
-
-  //use this function whenever you want to verify that the SD card is working properly
-
-  Serial.print("Initializing SD card...");
-
-  // see if the card is present and can be initialized:
-
-  if (!SD.begin(pin)) {
-
-    Serial.println("Card failed, or not present");
-
-    // don't do anything more:
-
-    return;
-  }
-  Serial.println("card initialized.");
 }
 
 /*
@@ -167,7 +327,6 @@ void writeSD(String command, int distanceTraveled) {
     Serial.println("error opening datalog.txt");
   }
 }
-
 
 /*
     A Method that is responsible of reversing the car's track
@@ -280,263 +439,4 @@ void BT() {
   }
   // after we are done with backtracking, remove the saved file..
   SD.remove("datalog.txt");
-}
-
-void setup() {
-  Serial.begin(9600);
-  Serial2.begin(9600);                         //For XBOX controller
-  US1.attach(TRIGGER_PIN1, ECHO_PIN1);
-  US2.attach(TRIGGER_PIN2, ECHO_PIN2);
-  car.begin();
-  odoLeft.attach(TRIGER_ODOL_PIN);
-  odoRight.attach(TRIGER_ODOR_PIN);
-  odoLeft.begin();
-  odoRight.begin();
-  pinMode(LED1, OUTPUT);
-  pinMode(LED2, OUTPUT);
-  pinMode(LED3, OUTPUT);
-  pinMode(LED4, OUTPUT);
-  pinMode(LED5, OUTPUT);
-  initialiseSD(SDpin);
-  // remove any existing log file to avoid executing the old routes
-  SD.remove("datalog.txt");
-}
-
-void loop() {
-
-  /*
-    Get current distance from front and back US sensors
-  */
-  int d1 = US1.getDistance();
-  int d2 = US2.getDistance();
-
-  avarageSpeed();                           // Display the average speed
-
-  /*
-     Get the direction to drive from the XBOX controller
-  */
-  if (Serial2.available() > 0) {
-
-    while (rData.length() < 3) {
-      char m = Serial2.read(); //add clause for using both serials for debugging
-
-      rData += String(m);
-
-    }
-  }
-
-  /*
-      Get the direction to drive from the Android/PC controller
-  */
-  else if (Serial.available() > 0) {
-
-    while (rData.length() < 1) {
-      char m = Serial.read(); //add clause for using both serials for debugging
-
-      if ( m == 'x') {
-        rData = String(m) + "00";
-
-      }
-      else {
-        rData = String(m) + "50";
-      }
-    }
-  }
-
-  /*
-     A switch case that makes sure that the car
-     will stop according to the car's directions.
-     Also, it will turn on the red led if there is any obstacle
-  */
-  switch (dir) {
-    case 'w':
-
-      if (d1 > 2 && d1 < 30) {
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        eStop(extract(), extract());
-
-
-      } else {
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, HIGH);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        moveFor(lSpeed, rSpeed);
-
-      }
-
-      break;
-
-    case 's':
-
-
-      if (d2 > 2 && d2 < 30) {
-        digitalWrite(LED1, HIGH);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        eStop(extract(), extract());
-
-      } else {
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
-        digitalWrite(LED3, HIGH);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5, LOW);
-        moveBack(lSpeed, rSpeed);
-
-      }
-
-      break;
-  }
-
-  /*
-       A switch case that controls the car movement
-  */
-
-  char y = rData.charAt(0);
-  // if y is not null we are saving the commands and the distance has been traveled to the file
-  if (y != '\0' && y != 'h') {
-    writeSD(String(y), distanceTraveled());
-  }
-
-  switch (y) {
-
-    case 'w' :                         //move forward
-
-      lSpeed = extract();
-      rSpeed = extract();
-      moveFor(lSpeed, rSpeed);
-
-      dir = 'w';
-      break;
-
-    case 'a' :                       //turn in-place to the left (more of a drift in place)
-
-      lSpeed = -extract();
-      rSpeed = extract();
-      turn(lSpeed, rSpeed);
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, HIGH);
-      digitalWrite(LED5, LOW);
-
-      break;
-
-    case 's' :                        //move backward
-
-      lSpeed = -extract();
-      rSpeed = -extract();
-      moveBack(lSpeed, rSpeed);
-
-      dir = 's';
-      break;
-
-    case 'd' :                      //turn in-place to the right (more of a drift in place)
-
-      lSpeed = extract();
-      rSpeed = -extract();
-      turn(lSpeed, rSpeed);
-
-      dir = 'd';
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, LOW);
-      digitalWrite(LED5, HIGH);
-      break;
-
-    case 'q' :                     //diagonal forward left turn
-
-      lSpeed = extract() / 2;
-      rSpeed = extract();
-      moveFor(lSpeed, rSpeed);
-
-      dir = 'q';
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, HIGH);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, HIGH);
-      digitalWrite(LED5, LOW);
-
-      break;
-
-    case 'e' :                    //diagonal forward right turn
-
-      lSpeed = extract();
-      rSpeed = extract() / 2;
-      moveFor(lSpeed, rSpeed);
-
-      dir = 'e';
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, HIGH);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, LOW);
-      digitalWrite(LED5, HIGH);
-
-      break;
-
-    case 'z' :                    //diagonal backward left turn
-
-      lSpeed = -(extract() / 2);
-      rSpeed = -extract();
-      moveBack(lSpeed, rSpeed);
-
-      dir = 'z';
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, HIGH);
-      digitalWrite(LED4, HIGH);
-      digitalWrite(LED5, LOW);
-
-      break;
-
-    case 'c' :                   //diagonal backward right turn
-
-      lSpeed = -extract();
-      rSpeed = -(extract() / 2);
-      moveBack(lSpeed, rSpeed);
-
-      dir = 'c';
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, HIGH);
-      digitalWrite(LED4, LOW);
-      digitalWrite(LED5, HIGH);
-
-      break;
-
-    case 'x' :                  //Stop
-      eStop(extract(), extract());
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, LOW);
-      digitalWrite(LED5, LOW);
-
-      dir = 'x';
-
-      break;
-    // backtracking case...
-    case 'h' :
-      BT();
-      break;
-
-    //print log file to monitor case
-    case 'j' :
-      printTXT();
-      break;
-
-    default :
-      break;
-  }
-
-  rData = "";
 }
