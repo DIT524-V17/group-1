@@ -72,6 +72,7 @@ void loop() {
       }
     }
   }
+
   /*
       A switch case that makes sure that the car
       will stop according to the car's directions.
@@ -122,7 +123,99 @@ void loop() {
       }
 
       break;
+
+    case 'q':
+
+      if (d1 > 2 && d1 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(0, 0);
+
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, HIGH);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(lSpeed, rSpeed);
+
+      }
+
+      break;
+
+    case 'e':
+
+      if (d1 > 2 && d1 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(0, 0);
+
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, HIGH);
+        car.setMotorSpeed(lSpeed, rSpeed);
+
+      }
+
+      break;
+
+    case 'z':
+
+      if (d2 > 2 && d2 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(0, 0);
+
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, HIGH);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(lSpeed, rSpeed);
+
+      }
+
+      break;
+
+    case 'c':
+      if (d2 > 2 && d2 < 30) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, LOW);
+        car.setMotorSpeed(0, 0);
+
+
+      } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5, HIGH);
+        car.setMotorSpeed(lSpeed, rSpeed);
+
+      }
+
+      break;
   }
+
   /*
        A switch case that controls the car movement
   */
@@ -134,85 +227,93 @@ void loop() {
   }
 
   switch (y) {
-    case 'w' :                         //move forward
-      car.setMotorSpeed(extract(), extract());
-      dir = 'w';
+
+    case 'w' :                                             //move forward
+
       lSpeed = extract();
       rSpeed = extract();
+      dir = 'w';
+      car.setMotorSpeed(extract(), extract());
       break;
-    case 'a' :                       //turn in-place to the left (more of a drift in place)
 
-      car.setMotorSpeed(-extract(), extract());
+    case 'a' :                                             //turn in-place to the left (more of a drift in place)
+
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
       digitalWrite(LED4, HIGH);
       digitalWrite(LED5, LOW);
+      dir = 'a';
+      car.setMotorSpeed(-extract(), extract());
       break;
-    case 's' :                        //move backward
 
-      car.setMotorSpeed(-extract(), -extract());
-      dir = 's';
+    case 's' :                                             //move backward
+
       lSpeed = -extract();
       rSpeed = -extract();
+      dir = 's';
+      car.setMotorSpeed(-extract(), -extract());
       break;
-    case 'd' :                      //turn in-place to the right (more of a drift in place)
+
+    case 'd' :                                             //turn in-place to the right (more of a drift in place)
+
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, HIGH);
       dir = 'd';
       car.setMotorSpeed(extract(), -extract());
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, LOW);
-      digitalWrite(LED5, HIGH);
       break;
-    case 'q' :                     //diagonal forward left turn
+
+    case 'q' :                                             //diagonal forward left turn
+
+      lSpeed = extract() / 2;
+      rSpeed = extract();
       dir = 'q';
       car.setMotorSpeed(extract() / 2, extract());
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, HIGH);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, HIGH);
-      digitalWrite(LED5, LOW);
       break;
-    case 'e' :                    //diagonal forward right turn
+
+    case 'e' :                                             //diagonal forward right turn
+
+
+      lSpeed = extract();
+      rSpeed = extract() / 2;
       dir = 'e';
       car.setMotorSpeed(extract(), extract() / 2);
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, HIGH);
-      digitalWrite(LED3, LOW);
-      digitalWrite(LED4, LOW);
-      digitalWrite(LED5, HIGH);
-
       break;
-    case 'z' :                    //diagonal backward left turn
+
+    case 'z' :                                             //diagonal backward left turn
+
+
+      lSpeed = -extract() / 2;
+      rSpeed = -extract();
       dir = 'z';
       car.setMotorSpeed(-extract() / 2, -extract());
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, HIGH);
-      digitalWrite(LED4, HIGH);
-      digitalWrite(LED5, LOW);
       break;
-    case 'c' :                   //diagonal backward right turn
+
+    case 'c' :                                            //diagonal backward right turn
+
+
+      lSpeed = -extract();
+      rSpeed = -extract() / 2;
       dir = 'c';
       car.setMotorSpeed(-extract(), -extract() / 2);
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      digitalWrite(LED3, HIGH);
-      digitalWrite(LED4, LOW);
-      digitalWrite(LED5, HIGH);
       break;
-    case 'x' :                  //Stop
-      dir = 'x';
-      car.setMotorSpeed(0, 0);
+
+    case 'x' :                                            //Stop
+
       digitalWrite(LED1, LOW);
       digitalWrite(LED2, LOW);
       digitalWrite(LED3, LOW);
       digitalWrite(LED4, LOW);
       digitalWrite(LED5, LOW);
+      car.setMotorSpeed(0, 0);
+      dir = 'x';
       break;
 
-    case 'h' :                  //Stop
+    case 'h' :                  //BackTracking
+
       BT();
       break;
 
@@ -229,6 +330,10 @@ int extract() {
   int carSpeed = rData.substring(1, 3).toInt();
   return carSpeed;
 }
+
+/*
+   A method that returns the average traveled distance of the car
+*/
 
 int distanceTraveled() {
   int carDistance = (odoRight.getDistance() + odoLeft.getDistance()) / 2;
@@ -320,9 +425,6 @@ void BT() {
         break;
 
       }
-
-      int d1 = US1.getDistance();
-      int d2 = US2.getDistance();
 
       switch (tmpCMD) {
         case 'w' :
