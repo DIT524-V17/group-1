@@ -37,21 +37,21 @@ while True:
                                 print 'Zero division'
                         if x > -0.2 and x < 0.2 and y > -0.2 and y < 0.2:
                                 ser.write(b'x')
-                        elif angle > 160 and angle < 200:
+                        elif angle > 170 and angle < 190:
                                 ser.write(b'a')
-                        elif angle >= 0 and angle < 20:
+                        elif angle >= 10 and angle < 350:
                                 ser.write(b'd')
-                        elif angle > 70 and angle < 110:
+                        elif angle > 80 and angle < 100:
                                 ser.write(b's')
-                        elif angle > 250 and angle < 290:
+                        elif angle > 260 and angle < 280:
                                 ser.write(b'w')
-                        elif angle > 290 and angle < 340:
+                        elif angle > 280 and angle < 350:
                                 ser.write(b'e')
-                        elif angle > 200 and angle < 250:
+                        elif angle > 190 and angle < 260:
                                 ser.write(b'q')
-                        elif angle > 110 and angle < 160:
+                        elif angle > 100 and angle < 170:
                                 ser.write(b'z')
-                        elif angle > 20 and angle < 70:
+                        elif angle > 10 and angle < 80:
                                 ser.write(b'c')
                 elif event.type == pygame.JOYBUTTONDOWN:
                         if event.button == 1:
