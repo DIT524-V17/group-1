@@ -417,39 +417,84 @@ void BT() {
   // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
     // since odometer values increas so i am resetting it by take modulu by total distance have saved before
-    while ( (distanceTraveled() % tatalDistance) < BTdistance[m] && BTcommands[m] != 'x') {
+    while ((distanceTraveled() % tatalDistance) < BTdistance[m] && BTcommands[m] != 'x') {
       char tmpCMD = BTcommands[m];
-      if ((distanceTraveled() % tatalDistance) + 1 >= (BTdistance[sizeof(BTcommands) - 1] - 43) && BTcommands[0] == 'x') {
+      if ((distanceTraveled() % tatalDistance) + 1 >= (BTdistance[sizeof(BTcommands) - 1] - 43)) {
+        digitalWrite(LED1, LOW);
         car.stop();
         SD.remove("datalog.txt");
         break;
 
       }
+      int d1 = US1.getDistance();
+      int d2 = US2.getDistance();
 
       switch (tmpCMD) {
         case 'w' :
-          car.setMotorSpeed(50, 50);
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(50, 50);
+          }
           break;
         case 'a' :
           car.setMotorSpeed(50, -50);
           break;
         case 's' :
-          car.setMotorSpeed(-50, -50);
+          if (d2 > 2 && d2 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(-50, -50);
+          }
           break;
         case 'd' :
           car.setMotorSpeed(-50, 50);
           break;
         case 'q' :
-          car.setMotorSpeed(25, 50);
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(25, 50);
+          }
           break;
         case 'e' :
-          car.setMotorSpeed(50, 25);
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(50, 25);
+          }
           break;
         case 'z' :
-          car.setMotorSpeed(-25, -50);
+          if (d2 > 2 && d2 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(-25, -50);
+          }
           break;
         case 'c' :
-          car.setMotorSpeed(-50, -25);
+          if (d2 > 2 && d2 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(-50, -25);
+          }
           break;
         default :
           break;

@@ -37,7 +37,7 @@ while True:
                                 print 'Zero division'
                         if x > -0.2 and x < 0.2 and y > -0.2 and y < 0.2:
                                 ser.write(b'x')
-                        elif angle >= 170 and angle =< 190:
+                        elif angle >= 170 and angle <= 190:
                                 ser.write(b'a')
                         elif angle <= 10 or angle >= 350:
                                 ser.write(b'd')
