@@ -44,7 +44,6 @@ public class Main extends Application {
         OutputStream os = con.openOutputStream();
         InputStream is = con.openInputStream();
 
-        //os.write("w".getBytes()); //just send '1' to the device
 
         Group root = new Group();
         Scene scene = new Scene(root, 500, 600);
@@ -123,8 +122,6 @@ public class Main extends Application {
                 double y = outerCircle.getCenterY() - innerCircle.getCenterY();
                 double angle = Math.atan2(y,x);
 
-                //System.out.println(Math.toDegrees(angle));
-
                 try {
                     switch (Double.toString(Math.toDegrees(angle))){
                         case "0.0":
@@ -164,20 +161,20 @@ public class Main extends Application {
                 try {
                     switch (keyEvent.getCode()) {
                         case W:
-                            innerCircle.setCenterY(300);
                             os.write("x".getBytes());
+                            innerCircle.setCenterY(300);
                             break;
                         case S:
-                            innerCircle.setCenterY(300);
                             os.write("x".getBytes());
+                            innerCircle.setCenterY(300);
                             break;
                         case D:
-                            innerCircle.setCenterX(250);
                             os.write("x".getBytes());
+                            innerCircle.setCenterX(250);
                             break;
                         case A:
-                            innerCircle.setCenterX(250);
                             os.write("x".getBytes());
+                            innerCircle.setCenterX(250);
                             break;
                     }
                 } catch (IOException e) {
