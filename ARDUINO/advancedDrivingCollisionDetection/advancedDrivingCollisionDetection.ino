@@ -57,7 +57,12 @@ void loop() {
   if (Serial2.available() > 0) {
     while (rData.length() < 3) {
       char m = Serial2.read(); //add clause for using both serials for debugging
-      rData += String(m);
+      if ( m == 'x') {
+        rData = String(m) + "00";
+      }
+      else {
+        rData = String(m) + "70";
+      }
     }
 
   }
@@ -381,7 +386,7 @@ void BT() {
   // open the file for count of lines
   while (myFile.available()) {
     String list = myFile.readStringUntil('\n');
-    tatalDistance = list.substring(1).toInt() + 43;
+    tatalDistance = list.substring(1).toInt();
     i++;
   }
   myFile.close();
@@ -403,23 +408,12 @@ void BT() {
   }
   myFile1.close();
 
-  // move the car 180 degrees
-  while (true) {
-    if (distanceTraveled() < tatalDistance) {
-      car.setMotorSpeed(80, -80);
-    }
-    else {
-      car.stop();
-      break;
-    }
-  }
-  delay(1000);
   // read everythings in arrays
   for (int m = 0; m < sizeof(BTcommands); m++) {
     // since odometer values increas so i am resetting it by take modulu by total distance have saved before
     while ((distanceTraveled() % tatalDistance) < BTdistance[m] && BTcommands[m] != 'x') {
       char tmpCMD = BTcommands[m];
-      if ((distanceTraveled() % tatalDistance) + 1 >= (BTdistance[sizeof(BTcommands) - 1] - 43)) {
+      if ((distanceTraveled() % tatalDistance) + 1 >= BTdistance[sizeof(BTcommands) - 1]) {
         digitalWrite(LED1, LOW);
         car.stop();
         SD.remove("datalog.txt");
@@ -431,19 +425,6 @@ void BT() {
 
       switch (tmpCMD) {
         case 'w' :
-          if (d1 > 2 && d1 < 30) {
-            digitalWrite(LED1, HIGH);
-            car.setMotorSpeed(0, 0);
-          }
-          else {
-            digitalWrite(LED1, LOW);
-            car.setMotorSpeed(50, 50);
-          }
-          break;
-        case 'a' :
-          car.setMotorSpeed(50, -50);
-          break;
-        case 's' :
           if (d2 > 2 && d2 < 30) {
             digitalWrite(LED1, HIGH);
             car.setMotorSpeed(0, 0);
@@ -453,30 +434,23 @@ void BT() {
             car.setMotorSpeed(-50, -50);
           }
           break;
+        case 'a' :
+          car.setMotorSpeed(50, -50);
+          break;
+        case 's' :
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(50, 50);
+          }
+          break;
         case 'd' :
           car.setMotorSpeed(-50, 50);
           break;
         case 'q' :
-          if (d1 > 2 && d1 < 30) {
-            digitalWrite(LED1, HIGH);
-            car.setMotorSpeed(0, 0);
-          }
-          else {
-            digitalWrite(LED1, LOW);
-            car.setMotorSpeed(25, 50);
-          }
-          break;
-        case 'e' :
-          if (d1 > 2 && d1 < 30) {
-            digitalWrite(LED1, HIGH);
-            car.setMotorSpeed(0, 0);
-          }
-          else {
-            digitalWrite(LED1, LOW);
-            car.setMotorSpeed(50, 25);
-          }
-          break;
-        case 'z' :
           if (d2 > 2 && d2 < 30) {
             digitalWrite(LED1, HIGH);
             car.setMotorSpeed(0, 0);
@@ -486,7 +460,7 @@ void BT() {
             car.setMotorSpeed(-25, -50);
           }
           break;
-        case 'c' :
+        case 'e' :
           if (d2 > 2 && d2 < 30) {
             digitalWrite(LED1, HIGH);
             car.setMotorSpeed(0, 0);
@@ -494,6 +468,26 @@ void BT() {
           else {
             digitalWrite(LED1, LOW);
             car.setMotorSpeed(-50, -25);
+          }
+          break;
+        case 'z' :
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(25, 50);
+          }
+          break;
+        case 'c' :
+          if (d1 > 2 && d1 < 30) {
+            digitalWrite(LED1, HIGH);
+            car.setMotorSpeed(0, 0);
+          }
+          else {
+            digitalWrite(LED1, LOW);
+            car.setMotorSpeed(50, 25);
           }
           break;
         default :
