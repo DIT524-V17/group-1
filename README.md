@@ -25,8 +25,9 @@ The Marvelous Amazing 👀 Car!
 
 
 # Documentation 📘
- 
+
 These are the parts we used in the M.A.C smartcar project:
+
 
 |  Amount	|  Part Type  | Properties  | 
 |---	|---	|---	| 

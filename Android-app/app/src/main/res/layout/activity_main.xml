@@ -15,28 +15,30 @@
 
     <TextView
         android:id="@+id/powerText"
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
         android:id="@+id/angleText"
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/powerText"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/powerText" />
+        android:layout_below="@+id/powerText"
+        android:layout_toEndOf="@+id/powerText"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
         android:id="@+id/speedText"
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/angleText"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/angleText"
-        />
+        android:layout_toEndOf="@+id/angleText"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <io.github.controlwear.virtual.joystick.android.JoystickView
         android:id="@+id/joystickView"
@@ -56,15 +58,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:onClick="buttonOnClick"
-        android:text="Start backtrack"
+        android:text="@string/start_backtrack"
         android:layout_below="@+id/powerText" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:headerDividersEnabled="false" />
+
 
 
 </RelativeLayout>
